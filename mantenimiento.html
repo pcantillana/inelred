@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nueva Ficha | INELRED</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 font-sans">
+
+    <!-- Navegación Consistente -->
+    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="dashboard.html" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">
+                    <i class="bi bi-arrow-left text-xl"></i>
+                </a>
+                <img src="img/logo.png" alt="Logo" class="h-8 w-auto bg-white rounded p-1">
+                <span class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">Nueva Ficha de Mantenimiento</span>
+            </div>
+            <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                <i class="bi bi-moon-fill dark:hidden"></i>
+                <i class="bi bi-sun-fill hidden dark:block text-yellow-400"></i>
+            </button>
+        </div>
+    </nav>
+
+    <main class="container mx-auto p-6 mt-4">
+        <div class="max-w-4xl mx-auto bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+            <div class="flex justify-between items-center mb-8">
+                <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                    <i class="bi bi-file-earmark-plus text-blue-600"></i> Formulario de Registro
+                </h1>
+            </div>
+            
+            <form id="fichaForm" class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa</label>
+                        <select id="empresa_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                            <option value="">Cargando empresas...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Solicitante</label>
+                        <select id="solicitante_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required disabled>
+                            <option value="">Selecciona una empresa primero</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                    <i class="bi bi-check-circle"></i> Guardar Ficha
+                </button>
+            </form>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBMcHFfBlG76ua3fVTOdpyXNXqXTooELf8",
+            authDomain: "inelred-e8f50.firebaseapp.com",
+            projectId: "inelred-e8f50",
+            storageBucket: "inelred-e8f50.firebasestorage.app",
+            messagingSenderId: "412934833273",
+            appId: "1:412934833273:web:734337299e2557ed8f40a8"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Seguridad
+        onAuthStateChanged(auth, (user) => { 
+            if (!user) window.location.href = 'index.html'; 
+            else cargarEmpresas();
+        });
+
+        // UI Tema
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        async function cargarEmpresas() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "empresas"));
+                const select = document.getElementById('empresa_id');
+                select.innerHTML = '<option value="">Seleccionar empresa</option>';
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    select.innerHTML += `<option value="${doc.id}">${data.nombre}</option>`;
+                });
+            } catch (e) {
+                console.error("Error:", e);
+            }
+        }
+
+        document.getElementById('empresa_id').addEventListener('change', async (e) => {
+            const empresaId = e.target.value;
+            const selectSol = document.getElementById('solicitante_id');
+            if (!empresaId) return;
+
+            selectSol.disabled = false;
+            selectSol.innerHTML = '<option value="">Cargando...</option>';
+
+            const q = query(collection(db, "solicitantes"), where("empresa_id", "==", empresaId));
+            const querySnapshot = await getDocs(q);
+            
+            selectSol.innerHTML = '<option value="">Seleccionar solicitante</option>';
+            querySnapshot.forEach((doc) => {
+                const s = doc.data();
+                selectSol.innerHTML += `<option value="${doc.id}">${s.nombre}</option>`;
+            });
+        });
+    </script>
+</body>
+</html>

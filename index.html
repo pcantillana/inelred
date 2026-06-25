@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="img/logo-ico.png">
+    <title>Login - INELRED</title>
+    <!-- Mantenemos Bootstrap para no perder tu diseño visual -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #003366, #0066cc);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+        }
+        .login-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
+            background: white;
+        }
+        .login-header {
+            background: #003366;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .login-header img {
+            max-height: 100px;
+            width: auto;
+            margin: 0 auto;
+        }
+        .login-header p {
+            margin-top: 15px;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        .card-body {
+            padding: 30px;
+        }
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+        }
+        .btn-primary {
+            background-color: #003366;
+            border: none;
+            padding: 10px 0;
+            font-size: 1.1rem;
+            border-radius: 8px;
+        }
+        .btn-primary:hover {
+            background-color: #002244;
+        }
+        /* Contenedor para mensajes de error UI (Reemplaza el alert) */
+        #mensajeError {
+            display: none;
+            border-radius: 8px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-5">
+                <div class="card login-card">
+                    <div class="login-header">
+                        <!-- Usamos un placeholder mientras agregas tu logo real -->
+                        <img src="img/logo.png" alt="Logo INELRED" class="rounded p-1" style="max-width: 200px; margin-bottom: 20px; ">
+                        <p>Sistema de Gestión de Mantenimiento</p>
+                    </div>
+
+                    <div class="card-body">
+                        <!-- Caja de mensajes de error -->
+                        <div id="mensajeError" class="alert alert-danger"></div>
+
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label class="form-label">Correo Electrónico</label>
+                                <input type="email" id="emailInput" class="form-control" placeholder="tu@empresa.cl" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Contraseña</label>
+                                <input type="password" id="passwordInput" class="form-control" placeholder="********" required>
+                            </div>
+                            <button type="submit" id="btnIngresar" class="btn btn-primary w-100">
+                                <span id="btnText">Iniciar Sesión</span>
+                                <!-- Spinner oculto para mostrar cuando carga -->
+                                <span id="btnSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            </button>
+                        </form>
+
+                        <footer>
+                            <p>&copy; <span id="current-year"></span> INELRED - Todos los derechos reservados.</p>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Indicamos que es un script de tipo 'module' para poder usar 'import' -->
+    <script type="module">
+        // 1. Importamos las funciones de Firebase directamente
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // 2. Tu configuración de Firebase (el código que te dio Google)
+        // NOTA: Añadí una validación para que funcione tanto en tu PC como en esta vista previa
+        const configLocal = {
+            apiKey: "AIzaSyBMcHFfBlG76ua3fVTOdpyXNXqXTooELf8",
+            authDomain: "inelred-e8f50.firebaseapp.com",
+            projectId: "inelred-e8f50",
+            storageBucket: "inelred-e8f50.firebasestorage.app",
+            messagingSenderId: "412934833273",
+            appId: "1:412934833273:web:734337299e2557ed8f40a8"
+        };
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : configLocal;
+
+        // 3. Inicializamos Firebase y la Autenticación en este mismo archivo
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.getElementById("current-year").textContent = new Date().getFullYear();
+
+        const loginForm = document.getElementById('loginForm');
+        const mensajeError = document.getElementById('mensajeError');
+        const btnIngresar = document.getElementById('btnIngresar');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Evitamos que la página se recargue
+
+            const email = document.getElementById('emailInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+
+            // Ocultar errores previos y mostrar estado de carga
+            mensajeError.style.display = 'none';
+            btnText.textContent = 'Verificando...';
+            btnSpinner.classList.remove('d-none');
+            btnIngresar.disabled = true;
+
+            try {
+                // Firebase intenta iniciar sesión
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                
+                // Si llegamos aquí, el login fue exitoso.
+                console.log("Usuario autenticado:", userCredential.user.email);
+                
+                // Redirigir al dashboard (que crearemos en el siguiente paso)
+                window.location.href = 'dashboard.html';
+                
+            } catch (error) {
+                console.error("Error de autenticación:", error.code);
+                
+                // Manejo de errores amigable para el usuario
+                if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                    mensajeError.textContent = "Correo o contraseña incorrectos.";
+                } else if (error.code === 'auth/network-request-failed') {
+                    mensajeError.textContent = "Error de red. Verifica tu conexión a internet.";
+                } else {
+                    mensajeError.textContent = "Ocurrió un error. Intenta nuevamente.";
+                }
+                
+                mensajeError.style.display = 'block';
+            } finally {
+                // Restaurar botón a estado normal
+                btnText.textContent = 'Iniciar Sesión';
+                btnSpinner.classList.add('d-none');
+                btnIngresar.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
