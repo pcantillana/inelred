@@ -1,7 +1,4 @@
---- js/firebase-config.js (原始)
 
-
-+++ js/firebase-config.js (修改后)
 // Configuración centralizada de Firebase para INELRED v2.0
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";

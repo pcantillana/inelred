@@ -1,7 +1,4 @@
---- README.md (原始)
 
-
-+++ README.md (修改后)
 # INELRED v2.0 - Sistema de Gestión de Mantenimiento
 
 Sistema moderno de gestión de mantenimiento migrado de PHP a Firebase con HTML, CSS y JavaScript.
