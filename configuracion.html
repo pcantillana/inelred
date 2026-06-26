@@ -1,621 +1,342 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuración | INELRED</title>
-    <link rel="icon" type="image/png" href="img/logo-ico.png">
-    
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f4f6f9; min-height: 100vh; }
-
-        /* NAVBAR */
-        .navbar { background: #003366; color: white; padding: 14px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
-        .navbar-brand { display: flex; align-items: center; gap: 12px; }
-        .navbar-brand img { height: 40px; }
-        .navbar-brand strong { font-size: 20px; letter-spacing: 1px; }
-        .btn-logout { background: #ffffff; color: #003366; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; text-decoration: none; transition: background 0.3s; }
-        .btn-logout:hover { background: #e0e0e0; }
-
-        /* CONTENIDO */
-        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        h1 { color: #003366; margin-bottom: 30px; font-size: 28px; }
-        
-        /* TABS */
-        .tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 2px solid #ddd; }
-        .tab { padding: 12px 24px; background: transparent; border: none; color: #666; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent; }
-        .tab:hover { color: #003366; }
-        .tab.active { color: #003366; border-bottom-color: #003366; }
-        
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-
-        /* SECCIONES */
-        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        h2 { color: #003366; font-size: 22px; }
-        
-        .btn-primary { background: #003366; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.3s; text-decoration: none; display: inline-block; }
-        .btn-primary:hover { background: #0055a5; }
-        
-        .search-box { padding: 9px 14px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; width: 250px; }
-        .search-box:focus { outline: none; border-color: #003366; }
-
-        /* FORMULARIOS */
-        .form-card { background: white; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 30px; border-left: 4px solid #003366; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; color: #333; font-weight: 600; margin-bottom: 6px; font-size: 14px; }
-        .form-group input, .form-group select { width: 100%; padding: 12px 14px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #003366; }
-        .form-group small { color: #888; font-size: 12px; display: block; margin-top: 4px; }
-        
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-actions { display: flex; gap: 10px; margin-top: 10px; }
-        .btn-secondary { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
-        .btn-secondary:hover { background: #5a6268; }
-
-        /* TABLAS */
-        .table-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th, td { padding: 14px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-        th { background: #f8f9fa; color: #333; font-weight: 600; }
-        tr:hover { background: #fafafa; }
-        .empty-row td { text-align: center; color: #999; padding: 30px; font-style: italic; }
-
-        /* BOTONES ACCIÓN */
-        .btn-action { padding: 6px 12px; margin-right: 5px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: 0.2s; }
-        .btn-edit { background: #ffc107; color: #212529; }
-        .btn-delete { background: #dc3545; color: white; }
-        .btn-action:hover { opacity: 0.85; transform: translateY(-1px); }
-
-        /* LOADING */
-        .loading { text-align: center; padding: 30px; color: #666; }
-        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #003366; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 0 auto 10px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* MODAL */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; }
-        .modal-overlay.active { display: flex; }
-        .modal { background: white; border-radius: 12px; padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-        .modal h3 { color: #003366; margin-bottom: 20px; font-size: 20px; }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-
-        /* TOAST */
-        .toast { position: fixed; top: 20px; right: 20px; padding: 15px 25px; border-radius: 8px; color: white; font-weight: 600; z-index: 2000; opacity: 0; transform: translateX(100%); transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .toast.show { opacity: 1; transform: translateX(0); }
-        .toast-success { background: #28a745; }
-        .toast-error { background: #dc3545; }
-        .toast-info { background: #17a2b8; }
-
-        /* BADGE CONTADOR */
-        .badge-count { background: #003366; color: white; padding: 3px 10px; border-radius: 12px; font-size: 12px; margin-left: 8px; }
-
-        @media (max-width: 768px) {
-            .form-row { grid-template-columns: 1fr; }
-            .section-header { flex-direction: column; align-items: stretch; }
-            .search-box { width: 100%; }
-        }
-    </style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 </head>
-<body>
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="navbar-brand">
-            <img src="img/logo-ico.png" alt="Logo INELRED">
-            <strong>INELRED</strong>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 font-sans">
+
+    <!-- Navbar Consistente -->
+    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors sticky top-0 z-50">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <a href="dashboard.html" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">
+                    <i class="bi bi-arrow-left text-xl"></i>
+                </a>
+                <img src="img/logo.png" alt="Logo" class="h-8 w-auto bg-white rounded p-1">
+                <span class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">Configuración de Maestros</span>
+            </div>
+            <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                <i class="bi bi-moon-fill dark:hidden"></i>
+                <i class="bi bi-sun-fill hidden dark:block text-yellow-400"></i>
+            </button>
         </div>
-        <a href="index.html" class="btn-logout">Salir</a>
     </nav>
 
-    <!-- TOAST NOTIFICATIONS -->
-    <div id="toast" class="toast"></div>
-
-    <!-- CONTENIDO PRINCIPAL -->
-    <div class="container">
-        <h1>⚙️ Configuración de Maestros</h1>
-
-        <!-- TABS -->
-        <div class="tabs">
-            <button class="tab active" onclick="switchTab('empresas', this)">🏢 Empresas <span id="countEmpresas" class="badge-count">0</span></button>
-            <button class="tab" onclick="switchTab('solicitantes', this)">👥 Solicitantes <span id="countSolicitantes" class="badge-count">0</span></button>
+    <!-- Contenido Principal -->
+    <main class="container mx-auto p-4 md:p-6 max-w-7xl">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <i class="bi bi-gear-fill text-slate-400"></i> Ajustes del Sistema
+            </h1>
         </div>
 
-        <!-- ========== TAB: EMPRESAS ========== -->
-        <div id="empresas" class="tab-content active">
-            <div class="section-header">
-                <h2>Administración de Empresas</h2>
-                <button class="btn-primary" onclick="toggleForm('empresaForm', '+ Nueva Empresa')">+ Nueva Empresa</button>
-            </div>
-
-            <div id="empresaForm" class="form-card" style="display: none;">
-                <h3 style="color: #003366; margin-bottom: 20px;">Registro de Empresa</h3>
-                <form id="formEmpresa">
-                    <input type="hidden" id="empresaId">
-                    <div class="form-group">
-                        <label for="nombreEmpresa">Nombre de la Empresa *</label>
-                        <input type="text" id="nombreEmpresa" required placeholder="Ej: TechCorp S.A." maxlength="100">
-                        <small>Ingrese el nombre legal o comercial de la empresa</small>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">💾 Guardar</button>
-                        <button type="button" class="btn-secondary" onclick="cancelarForm('empresaForm', 'formEmpresa')">Cancelar</button>
-                    </div>
-                </form>
-            </div>
-
-            <div class="table-container">
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="searchEmpresas" class="search-box" placeholder="🔍 Buscar empresa...">
-                </div>
-                <div id="loadingEmpresas" class="loading">
-                    <div class="spinner"></div>
-                    Cargando empresas...
-                </div>
-                <table id="tablaEmpresas" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre de Empresa</th>
-                            <th>Fecha de Registro</th>
-                            <th style="text-align: center;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodyEmpresas"></tbody>
-                </table>
-            </div>
+        <!-- Sistema de Tabs -->
+        <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6">
+            <button id="tab-empresas" class="px-6 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 focus:outline-none transition-colors" onclick="switchTab('empresas')">
+                <i class="bi bi-building mr-2"></i>Empresas
+            </button>
+            <button id="tab-solicitantes" class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none transition-colors" onclick="switchTab('solicitantes')">
+                <i class="bi bi-people mr-2"></i>Solicitantes
+            </button>
         </div>
 
-        <!-- ========== TAB: SOLICITANTES ========== -->
-        <div id="solicitantes" class="tab-content">
-            <div class="section-header">
-                <h2>Administración de Solicitantes</h2>
-                <button class="btn-primary" onclick="abrirFormSolicitante()">+ Nuevo Solicitante</button>
-            </div>
-
-            <div id="solicitanteForm" class="form-card" style="display: none;">
-                <h3 style="color: #003366; margin-bottom: 20px;" id="tituloFormSolicitante">Registro de Solicitante</h3>
-                <form id="formSolicitante">
-                    <input type="hidden" id="solicitanteId">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="nombreSolicitante">Nombre *</label>
-                            <input type="text" id="nombreSolicitante" required placeholder="Ej: Juan" maxlength="50">
+        <!-- ==================== SECCIÓN EMPRESAS ==================== -->
+        <div id="seccion-empresas" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Formulario Empresas -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
+                        <i class="bi bi-plus-circle text-blue-500"></i> Nueva Empresa
+                    </h2>
+                    <form id="formEmpresa" class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre de la Empresa</label>
+                            <input type="text" id="nombreEmpresa" placeholder="Ej: TechCorp S.A." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
                         </div>
-                        <div class="form-group">
-                            <label for="apellidoSolicitante">Apellido *</label>
-                            <input type="text" id="apellidoSolicitante" required placeholder="Ej: Pérez" maxlength="50">
+                        <button type="submit" id="btnGuardarEmpresa" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2">
+                            <i class="bi bi-save"></i> Guardar Empresa
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tabla Empresas -->
+            <div class="lg:col-span-2">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
+                                <tr>
+                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">ID</th>
+                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Nombre de Empresa</th>
+                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaEmpresas" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                                <tr><td colspan="3" class="p-4 text-center text-slate-500">Cargando datos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== SECCIÓN SOLICITANTES ==================== -->
+        <div id="seccion-solicitantes" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
+            <!-- Formulario Solicitantes -->
+            <div class="lg:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
+                        <i class="bi bi-person-plus text-emerald-500"></i> Nuevo Solicitante
+                    </h2>
+                    <form id="formSolicitante" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre</label>
+                                <input type="text" id="solNombre" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Apellido</label>
+                                <input type="text" id="solApellido" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="correoSolicitante">Correo Electrónico *</label>
-                        <input type="email" id="correoSolicitante" required placeholder="Ej: juan.perez@empresa.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="empresaSolicitante">Empresa a la que pertenece *</label>
-                        <select id="empresaSolicitante" required>
-                            <option value="">-- Selecciona una empresa --</option>
-                        </select>
-                        <small id="avisoEmpresas" style="color: #dc3545; display: none;">⚠️ Primero debes registrar al menos una empresa</small>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn-primary">💾 Guardar</button>
-                        <button type="button" class="btn-secondary" onclick="cancelarForm('solicitanteForm', 'formSolicitante')">Cancelar</button>
-                    </div>
-                </form>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Correo Electrónico</label>
+                            <input type="email" id="solCorreo" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa a la que pertenece</label>
+                            <select id="solEmpresaId" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
+                                <option value="">Cargando empresas...</option>
+                            </select>
+                        </div>
+                        <button type="submit" id="btnGuardarSolicitante" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2">
+                            <i class="bi bi-save"></i> Guardar Solicitante
+                        </button>
+                    </form>
+                </div>
             </div>
 
-            <div class="table-container">
-                <div style="margin-bottom: 15px;">
-                    <input type="text" id="searchSolicitantes" class="search-box" placeholder="🔍 Buscar por nombre, correo o empresa...">
+            <!-- Tabla Solicitantes -->
+            <div class="lg:col-span-2">
+                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
+                                <tr>
+                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Nombre Completo</th>
+                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Correo</th>
+                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Empresa</th>
+                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700 text-right">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listaSolicitantes" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
+                                <tr><td colspan="4" class="p-4 text-center text-slate-500">Cargando datos...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div id="loadingSolicitantes" class="loading">
-                    <div class="spinner"></div>
-                    Cargando solicitantes...
-                </div>
-                <table id="tablaSolicitantes" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Nombre Completo</th>
-                            <th>Correo</th>
-                            <th>Empresa</th>
-                            <th style="text-align: center;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tbodySolicitantes"></tbody>
-                </table>
             </div>
         </div>
-    </div>
+    </main>
 
-    <!-- MODAL DE CONFIRMACIÓN -->
-    <div id="modalConfirm" class="modal-overlay">
-        <div class="modal">
-            <h3 id="modalTitulo">Confirmar acción</h3>
-            <p id="modalMensaje" style="color: #555; line-height: 1.6;">¿Estás seguro de realizar esta acción?</p>
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="cerrarModal()">Cancelar</button>
-                <button class="btn-primary" id="btnConfirmar" style="background: #dc3545;">Confirmar</button>
-            </div>
-        </div>
-    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <script>
-        // ============================================
-        // 🔥 CONFIGURACIÓN DE FIREBASE
-        // ============================================
-        // ⚠️ IMPORTANTE: Reemplaza con tus credenciales reales de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_AUTH_DOMAIN",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyBMcHFfBlG76ua3fVTOdpyXNXqXTooELf8",
+            authDomain: "inelred-e8f50.firebaseapp.com",
+            projectId: "inelred-e8f50",
+            storageBucket: "inelred-e8f50.firebasestorage.app",
+            messagingSenderId: "412934833273",
+            appId: "1:412934833273:web:734337299e2557ed8f40a8"
         };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-        // ============================================
-        // VARIABLES GLOBALES
-        // ============================================
-        let empresasData = [];
-        let solicitantesData = [];
+        // Mapas globales para relacionar IDs con nombres
+        let empresasMap = {};
 
-        // ============================================
-        // UTILIDADES
-        // ============================================
-        function showToast(mensaje, tipo = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = mensaje;
-            toast.className = `toast toast-${tipo} show`;
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
+        // Control de UI (Tema y Tabs)
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
 
-        function switchTab(tabName, btn) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById(tabName).classList.add('active');
-        }
-
-        function toggleForm(formId, titulo) {
-            const form = document.getElementById(formId);
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
-            if (form.style.display === 'block') form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function cancelarForm(formId, formHtmlId) {
-            document.getElementById(formId).style.display = 'none';
-            document.getElementById(formHtmlId).reset();
-            document.getElementById(formHtmlId).querySelector('input[type="hidden"]').value = '';
-        }
-
-        function formatFecha(timestamp) {
-            if (!timestamp) return 'N/A';
-            const date = timestamp.toDate();
-            return date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        }
-
-        // ============================================
-        // MODAL DE CONFIRMACIÓN
-        // ============================================
-        function mostrarConfirmacion(titulo, mensaje, callback) {
-            document.getElementById('modalTitulo').textContent = titulo;
-            document.getElementById('modalMensaje').textContent = mensaje;
-            document.getElementById('modalConfirm').classList.add('active');
+        window.switchTab = (tab) => {
+            // Estilos de botones
+            const btnEmp = document.getElementById('tab-empresas');
+            const btnSol = document.getElementById('tab-solicitantes');
             
-            const btnConfirmar = document.getElementById('btnConfirmar');
-            const nuevoBtn = btnConfirmar.cloneNode(true);
-            btnConfirmar.parentNode.replaceChild(nuevoBtn, btnConfirmar);
-            
-            nuevoBtn.addEventListener('click', () => {
-                callback();
-                cerrarModal();
-            });
-        }
+            if (tab === 'empresas') {
+                btnEmp.className = "px-6 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 focus:outline-none transition-colors";
+                btnSol.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none transition-colors";
+                document.getElementById('seccion-empresas').classList.remove('hidden');
+                document.getElementById('seccion-solicitantes').classList.add('hidden');
+            } else {
+                btnSol.className = "px-6 py-3 text-sm font-bold border-b-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 focus:outline-none transition-colors";
+                btnEmp.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none transition-colors";
+                document.getElementById('seccion-solicitantes').classList.remove('hidden');
+                document.getElementById('seccion-empresas').classList.add('hidden');
+            }
+        };
 
-        function cerrarModal() {
-            document.getElementById('modalConfirm').classList.remove('active');
-        }
+        // Seguridad y Carga Inicial
+        onAuthStateChanged(auth, (user) => { 
+            if (!user) window.location.href = 'index.html'; 
+            else {
+                cargarEmpresas();
+            }
+        });
 
-        // ============================================
-        // 🏢 GESTIÓN DE EMPRESAS
-        // ============================================
+        // ================= EMPRESAS =================
         async function cargarEmpresas() {
             try {
-                const snapshot = await db.collection('empresas').orderBy('fechaCreacion', 'desc').get();
-                empresasData = [];
+                const snap = await getDocs(collection(db, "empresas"));
+                const lista = document.getElementById('listaEmpresas');
+                const selectSol = document.getElementById('solEmpresaId');
                 
-                snapshot.forEach(doc => {
-                    empresasData.push({ id: doc.id, ...doc.data() });
-                });
+                lista.innerHTML = '';
+                selectSol.innerHTML = '<option value="">Seleccionar empresa...</option>';
+                empresasMap = {}; // Resetear mapa
                 
-                renderizarEmpresas();
-                cargarSelectEmpresas();
-                document.getElementById('countEmpresas').textContent = empresasData.length;
-            } catch (error) {
-                console.error('Error al cargar empresas:', error);
-                document.getElementById('loadingEmpresas').innerHTML = '❌ Error al cargar empresas. Verifica tu configuración de Firebase.';
-                showToast('Error al cargar empresas', 'error');
-            }
-        }
+                if(snap.empty) {
+                    lista.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500">No hay empresas registradas</td></tr>';
+                }
 
-        function renderizarEmpresas(filtro = '') {
-            const tbody = document.getElementById('tbodyEmpresas');
-            tbody.innerHTML = '';
-            
-            const empresasFiltradas = empresasData.filter(e => 
-                e.nombre.toLowerCase().includes(filtro.toLowerCase())
-            );
-            
-            if (empresasFiltradas.length === 0) {
-                tbody.innerHTML = `<tr class="empty-row"><td colspan="4">${filtro ? 'No se encontraron resultados' : 'No hay empresas registradas. ¡Agrega la primera!'}</td></tr>`;
-            } else {
-                empresasFiltradas.forEach((empresa, index) => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td><strong>${empresa.nombre}</strong></td>
-                            <td>${formatFecha(empresa.fechaCreacion)}</td>
-                            <td style="text-align: center;">
-                                <button class="btn-action btn-edit" onclick="editarEmpresa('${empresa.id}')">✏️ Editar</button>
-                                <button class="btn-action btn-delete" onclick="confirmarEliminarEmpresa('${empresa.id}', '${empresa.nombre}')">🗑️ Eliminar</button>
+                snap.forEach(documento => {
+                    const data = documento.data();
+                    empresasMap[documento.id] = data.nombre; // Guardar en el diccionario
+
+                    // Llenar tabla
+                    lista.innerHTML += `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                            <td class="p-4 font-mono text-slate-400">${documento.id.slice(-6)}</td>
+                            <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre}</td>
+                            <td class="p-4 text-right">
+                                <button onclick="eliminarRegistro('empresas', '${documento.id}')" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     `;
-                });
-            }
-            
-            document.getElementById('loadingEmpresas').style.display = 'none';
-            document.getElementById('tablaEmpresas').style.display = 'table';
-        }
 
-        function cargarSelectEmpresas() {
-            const select = document.getElementById('empresaSolicitante');
-            const aviso = document.getElementById('avisoEmpresas');
-            select.innerHTML = '<option value="">-- Selecciona una empresa --</option>';
-            
-            if (empresasData.length === 0) {
-                aviso.style.display = 'block';
-                select.disabled = true;
-            } else {
-                aviso.style.display = 'none';
-                select.disabled = false;
-                empresasData.forEach(empresa => {
-                    select.innerHTML += `<option value="${empresa.id}">${empresa.nombre}</option>`;
+                    // Llenar select del formulario de solicitantes
+                    selectSol.innerHTML += `<option value="${documento.id}">${data.nombre}</option>`;
                 });
+
+                // Una vez cargadas las empresas, cargar los solicitantes para poder cruzar los nombres
+                cargarSolicitantes();
+            } catch (error) {
+                console.error("Error al cargar empresas:", error);
             }
         }
 
-        // Formulario de Empresa
         document.getElementById('formEmpresa').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const id = document.getElementById('empresaId').value;
-            const nombre = document.getElementById('nombreEmpresa').value.trim();
+            const input = document.getElementById('nombreEmpresa');
+            const btn = document.getElementById('btnGuardarEmpresa');
             
-            if (!nombre) {
-                showToast('El nombre es obligatorio', 'error');
-                return;
-            }
-            
+            if(!input.value.trim()) return;
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+
             try {
-                if (id) {
-                    await db.collection('empresas').doc(id).update({ nombre: nombre });
-                    showToast('Empresa actualizada correctamente', 'success');
-                } else {
-                    await db.collection('empresas').add({
-                        nombre: nombre,
-                        fechaCreacion: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    showToast('Empresa registrada correctamente', 'success');
-                }
-                
-                cancelarForm('empresaForm', 'formEmpresa');
+                await addDoc(collection(db, "empresas"), { nombre: input.value.trim() });
+                input.value = '';
                 cargarEmpresas();
             } catch (error) {
-                console.error(error);
-                showToast('Error: ' + error.message, 'error');
+                alert("Error al guardar: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-save"></i> Guardar Empresa';
             }
         });
 
-        function editarEmpresa(id) {
-            const empresa = empresasData.find(e => e.id === id);
-            if (!empresa) return;
-            
-            document.getElementById('empresaId').value = id;
-            document.getElementById('nombreEmpresa').value = empresa.nombre;
-            document.getElementById('empresaForm').style.display = 'block';
-            document.getElementById('empresaForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function confirmarEliminarEmpresa(id, nombre) {
-            mostrarConfirmacion(
-                'Eliminar empresa',
-                `¿Estás seguro de eliminar la empresa "${nombre}"? Esta acción no se puede deshacer.`,
-                () => eliminarEmpresa(id)
-            );
-        }
-
-        async function eliminarEmpresa(id) {
-            try {
-                // Verificar si hay solicitantes asociados
-                const solicitantesAsociados = solicitantesData.filter(s => s.empresaId === id);
-                if (solicitantesAsociados.length > 0) {
-                    showToast(`No se puede eliminar: tiene ${solicitantesAsociados.length} solicitante(s) asociado(s)`, 'error');
-                    return;
-                }
-                
-                await db.collection('empresas').doc(id).delete();
-                showToast('Empresa eliminada', 'success');
-                cargarEmpresas();
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
-            }
-        }
-
-        // Búsqueda en tiempo real
-        document.getElementById('searchEmpresas').addEventListener('input', (e) => {
-            renderizarEmpresas(e.target.value);
-        });
-
-        // ============================================
-        // 👥 GESTIÓN DE SOLICITANTES
-        // ============================================
-        function abrirFormSolicitante() {
-            if (empresasData.length === 0) {
-                showToast('Primero debes registrar al menos una empresa', 'info');
-                return;
-            }
-            document.getElementById('tituloFormSolicitante').textContent = 'Registro de Solicitante';
-            document.getElementById('solicitanteForm').style.display = 'block';
-            document.getElementById('solicitanteForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
+        // ================= SOLICITANTES =================
         async function cargarSolicitantes() {
             try {
-                const snapshot = await db.collection('solicitantes').orderBy('fechaCreacion', 'desc').get();
-                solicitantesData = [];
-                
-                snapshot.forEach(doc => {
-                    solicitantesData.push({ id: doc.id, ...doc.data() });
-                });
-                
-                renderizarSolicitantes();
-                document.getElementById('countSolicitantes').textContent = solicitantesData.length;
-            } catch (error) {
-                console.error('Error al cargar solicitantes:', error);
-                document.getElementById('loadingSolicitantes').innerHTML = '❌ Error al cargar solicitantes';
-                showToast('Error al cargar solicitantes', 'error');
-            }
-        }
+                const snap = await getDocs(collection(db, "solicitantes"));
+                const lista = document.getElementById('listaSolicitantes');
+                lista.innerHTML = '';
 
-        function renderizarSolicitantes(filtro = '') {
-            const tbody = document.getElementById('tbodySolicitantes');
-            tbody.innerHTML = '';
-            
-            const filtroLower = filtro.toLowerCase();
-            const solicitantesFiltrados = solicitantesData.filter(s => {
-                const empresa = empresasData.find(e => e.id === s.empresaId);
-                const nombreEmpresa = empresa ? empresa.nombre : '';
-                const textoCompleto = `${s.nombre} ${s.apellido} ${s.correo} ${nombreEmpresa}`.toLowerCase();
-                return textoCompleto.includes(filtroLower);
-            });
-            
-            if (solicitantesFiltrados.length === 0) {
-                tbody.innerHTML = `<tr class="empty-row"><td colspan="5">${filtro ? 'No se encontraron resultados' : 'No hay solicitantes registrados'}</td></tr>`;
-            } else {
-                solicitantesFiltrados.forEach((solicitante, index) => {
-                    const empresa = empresasData.find(e => e.id === solicitante.empresaId);
-                    const nombreEmpresa = empresa ? empresa.nombre : 'N/A';
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td><strong>${solicitante.nombre} ${solicitante.apellido}</strong></td>
-                            <td>${solicitante.correo}</td>
-                            <td><span style="background: #e7f1ff; color: #003366; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600;">${nombreEmpresa}</span></td>
-                            <td style="text-align: center;">
-                                <button class="btn-action btn-edit" onclick="editarSolicitante('${solicitante.id}')">✏️ Editar</button>
-                                <button class="btn-action btn-delete" onclick="confirmarEliminarSolicitante('${solicitante.id}', '${solicitante.nombre} ${solicitante.apellido}')">🗑️ Eliminar</button>
+                if(snap.empty) {
+                    lista.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">No hay solicitantes registrados</td></tr>';
+                    return;
+                }
+
+                snap.forEach(documento => {
+                    const data = documento.data();
+                    const nombreEmpresa = empresasMap[data.empresa_id] || '<span class="text-red-500">Empresa no encontrada</span>';
+
+                    lista.innerHTML += `
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
+                            <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre} ${data.apellido}</td>
+                            <td class="p-4 text-slate-600 dark:text-slate-400">${data.correo}</td>
+                            <td class="p-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">${nombreEmpresa}</span></td>
+                            <td class="p-4 text-right">
+                                <button onclick="eliminarRegistro('solicitantes', '${documento.id}')" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     `;
                 });
+            } catch (error) {
+                console.error("Error al cargar solicitantes:", error);
             }
-            
-            document.getElementById('loadingSolicitantes').style.display = 'none';
-            document.getElementById('tablaSolicitantes').style.display = 'table';
         }
 
-        // Formulario de Solicitante
         document.getElementById('formSolicitante').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const btn = document.getElementById('btnGuardarSolicitante');
             
-            const id = document.getElementById('solicitanteId').value;
-            const nombre = document.getElementById('nombreSolicitante').value.trim();
-            const apellido = document.getElementById('apellidoSolicitante').value.trim();
-            const correo = document.getElementById('correoSolicitante').value.trim();
-            const empresaId = document.getElementById('empresaSolicitante').value;
-            
-            if (!nombre || !apellido || !correo || !empresaId) {
-                showToast('Todos los campos son obligatorios', 'error');
-                return;
-            }
-            
+            const data = {
+                nombre: document.getElementById('solNombre').value.trim(),
+                apellido: document.getElementById('solApellido').value.trim(),
+                correo: document.getElementById('solCorreo').value.trim(),
+                empresa_id: document.getElementById('solEmpresaId').value
+            };
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
+
             try {
-                const data = {
-                    nombre: nombre,
-                    apellido: apellido,
-                    correo: correo,
-                    empresaId: empresaId
-                };
-                
-                if (id) {
-                    await db.collection('solicitantes').doc(id).update(data);
-                    showToast('Solicitante actualizado', 'success');
-                } else {
-                    data.fechaCreacion = firebase.firestore.FieldValue.serverTimestamp();
-                    await db.collection('solicitantes').add(data);
-                    showToast('Solicitante registrado', 'success');
+                await addDoc(collection(db, "solicitantes"), data);
+                document.getElementById('formSolicitante').reset();
+                cargarSolicitantes();
+            } catch (error) {
+                alert("Error al guardar: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-save"></i> Guardar Solicitante';
+            }
+        });
+
+        // ================= FUNCIÓN GLOBAL ELIMINAR =================
+        window.eliminarRegistro = async (coleccion, id) => {
+            if(confirm(`¿Estás seguro de que deseas eliminar este registro de ${coleccion}?`)) {
+                try {
+                    await deleteDoc(doc(db, coleccion, id));
+                    if(coleccion === 'empresas') cargarEmpresas();
+                    if(coleccion === 'solicitantes') cargarSolicitantes();
+                } catch(error) {
+                    alert("Error al eliminar: " + error.message);
                 }
-                
-                cancelarForm('solicitanteForm', 'formSolicitante');
-                cargarSolicitantes();
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
             }
-        });
+        };
 
-        function editarSolicitante(id) {
-            const solicitante = solicitantesData.find(s => s.id === id);
-            if (!solicitante) return;
-            
-            document.getElementById('solicitanteId').value = id;
-            document.getElementById('nombreSolicitante').value = solicitante.nombre;
-            document.getElementById('apellidoSolicitante').value = solicitante.apellido;
-            document.getElementById('correoSolicitante').value = solicitante.correo;
-            document.getElementById('empresaSolicitante').value = solicitante.empresaId;
-            document.getElementById('tituloFormSolicitante').textContent = 'Editar Solicitante';
-            document.getElementById('solicitanteForm').style.display = 'block';
-            document.getElementById('solicitanteForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-
-        function confirmarEliminarSolicitante(id, nombre) {
-            mostrarConfirmacion(
-                'Eliminar solicitante',
-                `¿Estás seguro de eliminar a "${nombre}"? Esta acción no se puede deshacer.`,
-                () => eliminarSolicitante(id)
-            );
-        }
-
-        async function eliminarSolicitante(id) {
-            try {
-                await db.collection('solicitantes').doc(id).delete();
-                showToast('Solicitante eliminado', 'success');
-                cargarSolicitantes();
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
-            }
-        }
-
-        // Búsqueda en tiempo real
-        document.getElementById('searchSolicitantes').addEventListener('input', (e) => {
-            renderizarSolicitantes(e.target.value);
-        });
-
-        // ============================================
-        // 🚀 INICIALIZACIÓN
-        // ============================================
-        (async function init() {
-            await cargarEmpresas();
-            await cargarSolicitantes();
-        })();
     </script>
 </body>
 </html>
