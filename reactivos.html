@@ -1,341 +1,151 @@
-
 <!DOCTYPE html>
 <html lang="es" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nueva Ficha Reactiva | INELRED</title>
+    <title>Emergencia Reactiva | INELRED</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 font-sans">
 
-    <!-- Navegación -->
-    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors">
+    <div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+    <nav class="bg-red-600 text-white px-6 py-4 shadow-md sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <a href="dashboard.html" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">
-                    <i class="bi bi-arrow-left text-xl"></i>
-                </a>
-                <img src="img/logo.png" alt="Logo" class="h-8 w-auto bg-white rounded p-1">
-                <span class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">Nueva Ficha Reactiva</span>
+                <a href="dashboard.html" class="text-red-200 hover:text-white transition"><i class="bi bi-arrow-left text-xl"></i></a>
+                <span class="text-sm font-bold uppercase tracking-wider"><i class="bi bi-exclamation-triangle-fill mr-2"></i> Atención de Emergencia (Reactivo)</span>
             </div>
-            <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                <i class="bi bi-moon-fill dark:hidden"></i>
-                <i class="bi bi-sun-fill hidden dark:block text-yellow-400"></i>
-            </button>
+            <div class="flex items-center gap-4">
+                <span class="text-xs font-mono bg-red-800 px-3 py-1 rounded-full">ID: REA-<span id="display_correlativo">...</span></span>
+            </div>
         </div>
     </nav>
 
-    <main class="container mx-auto p-6 mt-4">
-        <div class="max-w-5xl mx-auto bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <div class="flex justify-between items-center mb-8">
-                <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
-                    <i class="bi bi-exclamation-triangle text-red-600"></i> Formulario de Emergencias
-                </h1>
+    <main class="container mx-auto p-4 md:p-6 max-w-4xl">
+        <form id="reactivoForm" class="space-y-6">
+            
+            <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa Afectada</label>
+                        <select id="empresa_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none" required></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Sucursal</label>
+                        <select id="sucursal_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none" disabled required></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Solicitado por</label>
+                        <select id="solicitante_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none" disabled required></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Área Específica</label>
+                        <input type="text" id="area" placeholder="Ej: Tablero Principal, Casino..." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none" required>
+                    </div>
+                </div>
             </div>
 
-            <form id="reactivosForm" class="space-y-6">
-                <!-- Alerta de emergencia -->
-                <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-6">
-                    <div class="flex items-start gap-3">
-                        <i class="bi bi-exclamation-octagon-fill text-red-600 text-2xl"></i>
-                        <div>
-                            <h3 class="font-bold text-red-800 dark:text-red-400">Atención: Situación de Emergencia</h3>
-                            <p class="text-sm text-red-700 dark:text-red-500 mt-1">Este formulario es exclusivo para atender emergencias críticas que requieran intervención inmediata.</p>
+            <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2">Diagnóstico y Evidencia</h2>
+                
+                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Descripción de la falla y solución aplicada</label>
+                <textarea id="descripcion" rows="4" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none mb-6" required></textarea>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <div class="text-sm font-bold text-center mb-2 text-red-500">FOTO ANTES (Falla)</div>
+                        <div id="dzAntes" class="border-2 border-dashed border-red-300 rounded-xl p-6 text-center cursor-pointer bg-red-50 dark:bg-red-900/10">
+                            <i class="bi bi-camera text-2xl text-red-400"></i>
+                            <input type="file" id="fAntes" accept="image/*" class="hidden">
                         </div>
-                    </div>
-                </div>
-
-                <!-- Datos básicos -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa</label>
-                        <select id="empresa_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" required>
-                            <option value="">Cargando empresas...</option>
-                        </select>
+                        <div id="pAntes" class="mt-2 text-center"></div>
                     </div>
                     <div>
-                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Solicitante</label>
-                        <select id="solicitante_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" required disabled>
-                            <option value="">Selecciona una empresa primero</option>
-                        </select>
+                        <div class="text-sm font-bold text-center mb-2 text-emerald-500">FOTO DESPUÉS (Solución)</div>
+                        <div id="dzDespues" class="border-2 border-dashed border-emerald-300 rounded-xl p-6 text-center cursor-pointer bg-emerald-50 dark:bg-emerald-900/10">
+                            <i class="bi bi-check-circle text-2xl text-emerald-400"></i>
+                            <input type="file" id="fDespues" accept="image/*" class="hidden">
+                        </div>
+                        <div id="pDespues" class="mt-2 text-center"></div>
                     </div>
                 </div>
-
-                <!-- Tipo de emergencia y nivel crítico -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Tipo de Emergencia</label>
-                        <select id="tipo_emergencia" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" required>
-                            <option value="">Seleccionar tipo</option>
-                            <option value="corte_energia">Corte de Energía</option>
-                            <option value="fuga_agua">Fuga de Agua</option>
-                            <option value="falla_electrica">Falla Eléctrica</option>
-                            <option value="incendio">Incendio / Humo</option>
-                            <option value="equipamiento_critico">Falla Equipamiento Crítico</option>
-                            <option value="seguridad">Brecha de Seguridad</option>
-                            <option value="otro">Otro</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nivel Crítico</label>
-                        <select id="nivel_critico" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" required>
-                            <option value="">Seleccionar nivel</option>
-                            <option value="alto">ALTO - Parada operativa</option>
-                            <option value="medio">MEDIO - Afecta parcialmente</option>
-                            <option value="bajo">BAJO - Sin impacto inmediato</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Descripción de la emergencia -->
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Descripción de la Emergencia</label>
-                    <textarea id="descripcion" rows="4" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition resize-none" placeholder="Describe detalladamente la situación de emergencia..." required></textarea>
-                </div>
-
-                <!-- Ubicación exacta -->
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Ubicación Exacta</label>
-                    <input type="text" id="ubicacion" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" placeholder="Ej: Sala de servidores Piso 3, Pasillo B..." required>
-                </div>
-
-                <!-- Contacto de emergencia -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Teléfono de Contacto</label>
-                        <input type="tel" id="telefono_contacto" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" placeholder="+56 9 XXXX XXXX" required>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Email de Contacto</label>
-                        <input type="email" id="email_contacto" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" placeholder="contacto@empresa.com" required>
-                    </div>
-                </div>
-
-                <!-- Acciones inmediatas tomadas -->
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Acciones Inmediatas Tomadas</label>
-                    <textarea id="acciones_inmediatas" rows="3" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition resize-none" placeholder="¿Qué acciones se tomaron antes de reportar?"></textarea>
-                </div>
-
-                <!-- Evidencia fotográfica (URL o descripción) -->
-                <div>
-                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Evidencia Fotográfica (URL)</label>
-                    <input type="url" id="evidencia_url" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-red-500 outline-none transition" placeholder="https://...">
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Opcional: Ingresa URL de imagen alojada en la nube</p>
-                </div>
-
-                <!-- Botón guardar -->
-                <button type="submit" id="btnGuardar" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition flex items-center justify-center gap-2">
-                    <i class="bi bi-exclamation-circle"></i> Reportar Emergencia
-                </button>
-            </form>
-        </div>
-
-        <!-- Listado de reactivos -->
-        <div class="max-w-5xl mx-auto mt-8 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
-            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
-                <i class="bi bi-clock-history text-red-600"></i> Emergencias Atendidas
-            </h2>
-            <div class="table-container">
-                <table class="table-styled" id="tablaReactivos">
-                    <thead>
-                        <tr class="text-sm text-slate-500 dark:text-slate-400 uppercase">
-                            <th>Fecha/Hora</th>
-                            <th>Empresa</th>
-                            <th>Tipo</th>
-                            <th>Nivel</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody class="text-sm" id="bodyTablaReactivos">
-                        <tr><td colspan="6" class="text-center py-4">Cargando...</td></tr>
-                    </tbody>
-                </table>
             </div>
-        </div>
+
+            <button type="submit" id="btnGuardar" class="w-full bg-red-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-red-700 transition shadow-lg shadow-red-500/30">
+                Cerrar Emergencia
+            </button>
+        </form>
     </main>
 
     <script type="module">
-        import { auth, db, initTheme, checkAuth, formatDate } from './js/firebase-config.js';
-        import { collection, getDocs, addDoc, query, where, orderBy, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, where, orderBy, limit, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        // Inicializar tema
-        initTheme();
+        const firebaseConfig = { apiKey: "AIzaSyBMcHFfBlG76ua3fVTOdpyXNXqXTooELf8", authDomain: "inelred-e8f50.firebaseapp.com", projectId: "inelred-e8f50", storageBucket: "inelred-e8f50.firebasestorage.app", messagingSenderId: "412934833273", appId: "1:412934833273:web:734337299e2557ed8f40a8" };
+        const app = initializeApp(firebaseConfig); const db = getFirestore(app); const storage = getStorage(app);
+        
+        let correlativoNum = 1;
 
-        // Verificar autenticación
-        checkAuth();
+        if (localStorage.theme === 'dark') document.documentElement.classList.add('dark');
 
-        // Cargar empresas
-        async function cargarEmpresas() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "empresas"));
-                const select = document.getElementById('empresa_id');
-                select.innerHTML = '<option value="">Seleccionar empresa</option>';
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    select.innerHTML += `<option value="${doc.id}">${data.nombre}</option>`;
-                });
-            } catch (e) {
-                console.error("Error:", e);
+        onAuthStateChanged(getAuth(app), async (user) => { 
+            if(!user) window.location.href='index.html'; 
+            else {
+                // Obtener Correlativo
+                const q = query(collection(db, "fichas_reactivos"), orderBy("correlativo", "desc"), limit(1));
+                const snapC = await getDocs(q);
+                if(!snapC.empty) correlativoNum = snapC.docs[0].data().correlativo + 1;
+                document.getElementById('display_correlativo').textContent = correlativoNum.toString().padStart(3, '0');
+
+                // Llenar empresas
+                const snapE = await getDocs(collection(db, "empresas"));
+                const s = document.getElementById('empresa_id'); s.innerHTML = '<option value="">Seleccionar empresa</option>';
+                snapE.forEach(d => s.innerHTML += `<option value="${d.id}">${d.data().nombre}</option>`);
             }
-        }
+        });
 
-        // Cargar solicitantes por empresa
         document.getElementById('empresa_id').addEventListener('change', async (e) => {
-            const empresaId = e.target.value;
-            const selectSol = document.getElementById('solicitante_id');
-            if (!empresaId) return;
-
-            selectSol.disabled = false;
-            selectSol.innerHTML = '<option value="">Cargando...</option>';
-
-            const q = query(collection(db, "solicitantes"), where("empresa_id", "==", empresaId));
-            const querySnapshot = await getDocs(q);
-
-            selectSol.innerHTML = '<option value="">Seleccionar solicitante</option>';
-            querySnapshot.forEach((doc) => {
-                const s = doc.data();
-                selectSol.innerHTML += `<option value="${doc.id}">${s.nombre}</option>`;
-            });
+            const id = e.target.value; const selSol = document.getElementById('solicitante_id'); const selSuc = document.getElementById('sucursal_id');
+            if(!id){ selSol.disabled=true; selSuc.disabled=true; return; }
+            selSol.disabled=false; selSuc.disabled=false;
+            const [snapSol, snapSuc] = await Promise.all([ getDocs(query(collection(db, "solicitantes"), where("empresas", "array-contains", id))), getDocs(query(collection(db, "sucursales"), where("empresa_id", "==", id))) ]);
+            selSol.innerHTML = '<option value="">Seleccionar</option>'; snapSol.forEach(d => selSol.innerHTML+=`<option value="${d.id}">${d.data().nombre}</option>`);
+            selSuc.innerHTML = '<option value="">Seleccionar</option>'; snapSuc.forEach(d => selSuc.innerHTML+=`<option value="${d.id}">${d.data().alias}</option>`);
         });
 
-        // Guardar ficha reactiva
-        document.getElementById('reactivosForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+        const setupFoto = (dzId, fId, pId) => {
+            const dz=document.getElementById(dzId), fi=document.getElementById(fId), p=document.getElementById(pId);
+            dz.onclick=()=>fi.click(); fi.onchange=()=>{ 
+                if(fi.files[0]) { const r=new FileReader(); r.onload=e=>{ p.innerHTML=`<img src="${e.target.result}" class="w-full h-32 object-cover rounded shadow">`; }; r.readAsDataURL(fi.files[0]); }
+            };
+        };
+        setupFoto('dzAntes', 'fAntes', 'pAntes'); setupFoto('dzDespues', 'fDespues', 'pDespues');
 
-            const btnGuardar = document.getElementById('btnGuardar');
-            btnGuardar.disabled = true;
-            btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Reportando...';
-
+        document.getElementById('reactivoForm').addEventListener('submit', async (e) => {
+            e.preventDefault(); const btn = document.getElementById('btnGuardar'); btn.disabled=true; btn.innerHTML='Registrando...';
             try {
-                const nuevaEmergencia = {
-                    empresa_id: document.getElementById('empresa_id').value,
-                    solicitante_id: document.getElementById('solicitante_id').value,
-                    tipo_emergencia: document.getElementById('tipo_emergencia').value,
-                    nivel_critico: document.getElementById('nivel_critico').value,
-                    descripcion: document.getElementById('descripcion').value,
-                    ubicacion: document.getElementById('ubicacion').value,
-                    telefono_contacto: document.getElementById('telefono_contacto').value,
-                    email_contacto: document.getElementById('email_contacto').value,
-                    acciones_inmediatas: document.getElementById('acciones_inmediatas').value,
-                    evidencia_url: document.getElementById('evidencia_url').value,
-                    estado: 'activo',
-                    fecha_reporte: new Date().toISOString(),
-                    created_by: auth.currentUser.uid
-                };
+                let urlAntes = '', urlDesp = '';
+                const fA = document.getElementById('fAntes').files[0], fD = document.getElementById('fDespues').files[0];
+                const ts = Date.now();
+                if(fA) { const r = ref(storage, `reactivos/REA_${correlativoNum}_antes_${ts}`); await uploadBytes(r, fA); urlAntes = await getDownloadURL(r); }
+                if(fD) { const r = ref(storage, `reactivos/REA_${correlativoNum}_desp_${ts}`); await uploadBytes(r, fD); urlDesp = await getDownloadURL(r); }
 
-                await addDoc(collection(db, "fichas_reactivos"), nuevaEmergencia);
-
-                alert('✅ Emergencia reportada exitosamente. El equipo técnico ha sido notificado.');
-                document.getElementById('reactivosForm').reset();
-                cargarReactivos();
-            } catch (error) {
-                console.error("Error al guardar:", error);
-                alert('❌ Error al reportar la emergencia');
-            } finally {
-                btnGuardar.disabled = false;
-                btnGuardar.innerHTML = '<i class="bi bi-exclamation-circle"></i> Reportar Emergencia';
-            }
+                await addDoc(collection(db, "fichas_reactivos"), {
+                    correlativo: correlativoNum, id_str: `REA-${correlativoNum.toString().padStart(3,'0')}`,
+                    empresa: document.getElementById('empresa_id').value, suc: document.getElementById('sucursal_id').value, sol: document.getElementById('solicitante_id').value,
+                    area: document.getElementById('area').value, desc: document.getElementById('descripcion').value,
+                    foto_antes: urlAntes, foto_despues: urlDesp, timestamp: serverTimestamp()
+                });
+                alert("Emergencia registrada exitosamente"); window.location.href="dashboard.html";
+            } catch(er) { alert("Error: "+er.message); btn.disabled=false; btn.innerHTML='Cerrar Emergencia'; }
         });
-
-        // Cargar reactivos en la tabla
-        async function cargarReactivos() {
-            try {
-                const bodyTabla = document.getElementById('bodyTablaReactivos');
-                const q = query(collection(db, "fichas_reactivos"), orderBy("fecha_reporte", "desc"));
-                const snapshot = await getDocs(q);
-
-                if (snapshot.empty) {
-                    bodyTabla.innerHTML = '<tr><td colspan="6" class="text-center py-4 text-slate-500">No hay emergencias registradas</td></tr>';
-                    return;
-                }
-
-                // Cargar empresas para mostrar nombres
-                const empresasMap = {};
-                const empresasSnapshot = await getDocs(collection(db, "empresas"));
-                empresasSnapshot.forEach(doc => {
-                    empresasMap[doc.id] = doc.data().nombre;
-                });
-
-                bodyTabla.innerHTML = '';
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const empresaNombre = empresasMap[data.empresa_id] || 'Desconocida';
-
-                    const nivelClass = {
-                        'alto': 'badge-danger',
-                        'medio': 'badge-warning',
-                        'bajo': 'badge-info'
-                    }[data.nivel_critico] || 'badge-info';
-
-                    const estadoClass = {
-                        'activo': 'badge-danger',
-                        'en_atencion': 'badge-warning',
-                        'resuelto': 'badge-success',
-                        'cerrado': 'badge-info'
-                    }[data.estado] || 'badge-info';
-
-                    bodyTabla.innerHTML += `
-                        <tr class="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
-                            <td class="py-3">${formatDate(data.fecha_reporte)}</td>
-                            <td class="font-medium">${empresaNombre}</td>
-                            <td class="capitalize">${data.tipo_emergencia.replace('_', ' ')}</td>
-                            <td><span class="badge ${nivelClass}">${data.nivel_critico}</span></td>
-                            <td><span class="badge ${estadoClass}">${data.estado.replace('_', ' ')}</span></td>
-                            <td>
-                                <div class="flex gap-2">
-                                    <button onclick="window.verDetalleReactivo('${docSnap.id}')" class="text-blue-600 hover:text-blue-800 dark:text-blue-400" title="Ver detalle">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button onclick="window.editarReactivo('${docSnap.id}')" class="text-green-600 hover:text-green-800 dark:text-green-400" title="Actualizar estado">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button onclick="window.eliminarReactivo('${docSnap.id}')" class="text-red-600 hover:text-red-800 dark:text-red-400" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error al cargar reactivos:", error);
-                document.getElementById('bodyTablaReactivos').innerHTML = '<tr><td colspan="6" class="text-center py-4 text-red-500">Error al cargar datos</td></tr>';
-            }
-        }
-
-        // Funciones globales
-        window.verDetalleReactivo = async (id) => {
-            alert('Función de ver detalle en desarrollo - ID: ' + id);
-        };
-
-        window.editarReactivo = async (id) => {
-            alert('Función de edición en desarrollo - ID: ' + id);
-        };
-
-        window.eliminarReactivo = async (id) => {
-            if (confirm('¿Estás seguro de eliminar este reporte de emergencia?')) {
-                try {
-                    await deleteDoc(doc(db, "fichas_reactivos", id));
-                    alert('✅ Reporte eliminado');
-                    cargarReactivos();
-                } catch (error) {
-                    console.error("Error al eliminar:", error);
-                    alert('❌ Error al eliminar');
-                }
-            }
-        };
-
-        // Cargar datos iniciales
-        cargarEmpresas();
-        cargarReactivos();
     </script>
 </body>
 </html>

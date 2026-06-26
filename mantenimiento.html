@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración | INELRED</title>
+    <title>Nueva Ficha | INELRED</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .dropzone.dragover { background-color: #eff6ff; border-color: #3b82f6; }
+        .dark .dropzone.dragover { background-color: #1e3a8a; border-color: #60a5fa; }
+        #sugerencias_equipo::-webkit-scrollbar { width: 6px; }
+        #sugerencias_equipo::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+        .dark #sugerencias_equipo::-webkit-scrollbar-thumb { background-color: #475569; }
+    </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 font-sans">
 
@@ -20,209 +27,138 @@
                 <a href="dashboard.html" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">
                     <i class="bi bi-arrow-left text-xl"></i>
                 </a>
-                <img src="img/logo.png" alt="Logo" class="h-8 w-auto bg-white rounded p-1">
-                <span class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">Configuración de Maestros</span>
+                <span class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Nueva Ficha de Mantenimiento</span>
             </div>
-            <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
-                <i class="bi bi-moon-fill dark:hidden"></i>
-                <i class="bi bi-sun-fill hidden dark:block text-yellow-400"></i>
-            </button>
+            <div class="flex items-center gap-4">
+                <span class="text-xs text-slate-400 font-mono hidden md:inline-block">ID: MTTO-<span id="display_numero_ficha">...</span></span>
+                <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                    <i class="bi bi-moon-fill dark:hidden"></i>
+                    <i class="bi bi-sun-fill hidden dark:block text-yellow-400"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <main class="container mx-auto p-4 md:p-6 max-w-7xl">
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <i class="bi bi-gear-fill text-slate-400"></i> Ajustes del Sistema
-            </h1>
-        </div>
-
-        <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6 overflow-x-auto">
-            <button id="tab-empresas" class="tab-btn px-6 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('empresas', 'blue')">
-                <i class="bi bi-building mr-2"></i>Empresas
-            </button>
-            <button id="tab-sucursales" class="tab-btn px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('sucursales', 'purple')">
-                <i class="bi bi-shop mr-2"></i>Sucursales
-            </button>
-            <button id="tab-solicitantes" class="tab-btn px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('solicitantes', 'emerald')">
-                <i class="bi bi-people mr-2"></i>Solicitantes
-            </button>
-            <button id="tab-equipos" class="tab-btn px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('equipos', 'orange')">
-                <i class="bi bi-tools mr-2"></i>Equipos
-            </button>
-        </div>
-
-        <div id="seccion-empresas" class="tab-section grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
-                        <i class="bi bi-building text-blue-500"></i> <span id="titulo-form-empresa">Nueva Empresa</span>
-                    </h2>
-                    <form id="formEmpresa" class="space-y-4">
-                        <input type="hidden" id="empId">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre de la Empresa</label>
-                            <input type="text" id="empNombre" placeholder="Ej: TechCorp S.A." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="button" id="btnCancelEmpresa" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition" onclick="resetForm('Empresa', 'blue')">Cancelar</button>
-                            <button type="submit" id="btnGuardarEmpresa" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
-                                <tr><th class="p-4">Nombre de Empresa</th><th class="p-4 text-right">Acciones</th></tr>
-                            </thead>
-                            <tbody id="listaEmpresas" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
-                        </table>
+    <main class="container mx-auto p-4 md:p-6 max-w-5xl">
+        <form id="fichaForm" class="space-y-6">
+            
+            <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+                <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2"><i class="bi bi-info-square text-blue-500 mr-2"></i>Información General</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Fecha Solicitud</label>
+                        <input type="date" id="fecha_solicitud" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa</label>
+                        <select id="empresa_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                            <option value="">Cargando empresas...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Solicitante</label>
+                        <select id="solicitante_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required disabled>
+                            <option value="">Selecciona una empresa primero</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Sucursal</label>
+                        <select id="sucursal_id" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required disabled>
+                            <option value="">Selecciona una empresa primero</option>
+                        </select>
+                    </div>
+                    <!-- Correos Dinámicos del Solicitante -->
+                    <div class="md:col-span-2 hidden" id="seccion_correos">
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Enviar Notificación a:</label>
+                        <div id="lista_correos" class="flex flex-wrap gap-3"></div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="seccion-sucursales" class="tab-section grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-            <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
-                        <i class="bi bi-shop text-purple-500"></i> <span id="titulo-form-sucursal">Nueva Sucursal</span>
-                    </h2>
-                    <form id="formSucursal" class="space-y-4">
-                        <input type="hidden" id="sucId">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa</label>
-                            <select id="sucEmpresaId" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition" required></select>
+            <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+                <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2"><i class="bi bi-tools text-orange-500 mr-2"></i>Datos del Equipo</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2 relative">
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Buscar Equipo</label>
+                        <div class="relative">
+                            <i class="bi bi-search absolute left-3 top-3.5 text-slate-400"></i>
+                            <input type="text" id="buscar_equipo" placeholder="Buscar por código, nombre o serie..." class="w-full pl-10 p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" autocomplete="off" required>
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre de Sucursal</label>
-                            <input type="text" id="sucNombre" placeholder="Ej: Planta Norte" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition" required>
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="button" id="btnCancelSucursal" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition" onclick="resetForm('Sucursal', 'purple')">Cancelar</button>
-                            <button type="submit" id="btnGuardarSucursal" class="flex-1 bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition flex items-center justify-center gap-2">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
-                                <tr><th class="p-4">Sucursal</th><th class="p-4">Empresa</th><th class="p-4 text-right">Acciones</th></tr>
-                            </thead>
-                            <tbody id="listaSucursales" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
-                        </table>
+                        <div id="sugerencias_equipo" class="absolute z-10 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Cód. Interno</label>
+                        <input type="text" id="equipo_codigo" class="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none cursor-not-allowed text-slate-500" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">N° de Serie</label>
+                        <input type="text" id="equipo_serie" class="w-full p-3 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none cursor-not-allowed text-slate-500" readonly>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div id="seccion-solicitantes" class="tab-section grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-            <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
-                        <i class="bi bi-person-plus text-emerald-500"></i> <span id="titulo-form-solicitante">Nuevo Solicitante</span>
-                    </h2>
-                    <form id="formSolicitante" class="space-y-4">
-                        <input type="hidden" id="solId">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa</label>
-                            <select id="solEmpresaId" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required></select>
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre</label>
-                                <input type="text" id="solNombre" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
+            <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+                <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2"><i class="bi bi-card-checklist text-emerald-500 mr-2"></i>Tipo y Revisión</h2>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-3">Tipo de Mantenimiento</label>
+                    <div class="flex gap-4">
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tipo_mantenimiento" value="preventivo" class="peer sr-only" required>
+                            <div class="text-center p-3 border-2 border-slate-200 dark:border-slate-700 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50 dark:peer-checked:bg-blue-900/30 peer-checked:text-blue-700 dark:peer-checked:text-blue-400 font-medium transition">
+                                Preventivo
                             </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Apellido</label>
-                                <input type="text" id="solApellido" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
+                        </label>
+                        <label class="flex-1 cursor-pointer">
+                            <input type="radio" name="tipo_mantenimiento" value="correctivo" class="peer sr-only">
+                            <div class="text-center p-3 border-2 border-slate-200 dark:border-slate-700 rounded-lg peer-checked:border-red-500 peer-checked:bg-red-50 dark:peer-checked:bg-red-900/30 peer-checked:text-red-700 dark:peer-checked:text-red-400 font-medium transition">
+                                Correctivo
                             </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Correo</label>
-                            <input type="email" id="solCorreo" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="button" id="btnCancelSolicitante" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition" onclick="resetForm('Solicitante', 'emerald')">Cancelar</button>
-                            <button type="submit" id="btnGuardarSolicitante" class="flex-1 bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
-                                <tr><th class="p-4">Nombre Completo</th><th class="p-4">Correo</th><th class="p-4">Empresa</th><th class="p-4 text-right">Acciones</th></tr>
-                            </thead>
-                            <tbody id="listaSolicitantes" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
-                        </table>
+                        </label>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <div id="seccion-equipos" class="tab-section grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-            <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
-                        <i class="bi bi-tools text-orange-500"></i> <span id="titulo-form-equipo">Nuevo Equipo</span>
-                    </h2>
-                    <form id="formEquipo" class="space-y-4">
-                        <input type="hidden" id="eqId">
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre del Equipo</label>
-                            <input type="text" id="eqNombre" placeholder="Ej: Motor Eléctrico" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Marca</label>
-                            <input type="text" id="eqMarca" placeholder="Ej: Siemens" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition" required>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">N° Serie / Modelo</label>
-                            <input type="text" id="eqSerie" placeholder="Ej: SM-2023-991" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none transition" required>
-                        </div>
-                        <div class="flex gap-2">
-                            <button type="button" id="btnCancelEquipo" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 py-3 rounded-lg font-bold hover:bg-slate-300 dark:hover:bg-slate-600 transition" onclick="resetForm('Equipo', 'orange')">Cancelar</button>
-                            <button type="submit" id="btnGuardarEquipo" class="flex-1 bg-orange-600 text-white py-3 rounded-lg font-bold hover:bg-orange-700 transition flex items-center justify-center gap-2">
-                                <i class="bi bi-save"></i> Guardar
-                            </button>
-                        </div>
-                    </form>
+                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-3">Tareas Básicas</label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <label class="flex items-center gap-3 p-3 border border-slate-100 dark:border-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition">
+                        <input type="checkbox" name="tareas" value="Limpieza Externa" class="w-4 h-4 text-blue-600 rounded border-gray-300"><span>Limpieza Externa</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 border border-slate-100 dark:border-slate-800 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer transition">
+                        <input type="checkbox" name="tareas" value="Limpieza Interna" class="w-4 h-4 text-blue-600 rounded border-gray-300"><span>Limpieza Interna</span>
+                    </label>
                 </div>
             </div>
-            <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
-                                <tr><th class="p-4">Equipo</th><th class="p-4">Marca</th><th class="p-4">Serie</th><th class="p-4 text-right">Acciones</th></tr>
-                            </thead>
-                            <tbody id="listaEquipos" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm"></tbody>
-                        </table>
+
+            <div class="bg-white dark:bg-slate-900 p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
+                <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2"><i class="bi bi-camera text-purple-500 mr-2"></i>Observaciones y Evidencia</h2>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Observaciones</label>
+                    <textarea id="observaciones" rows="4" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" placeholder="Detalla el estado..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Registro Fotográfico</label>
+                    <div id="dropzone" class="dropzone border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-8 text-center cursor-pointer hover:border-blue-500 dark:hover:border-blue-400 transition">
+                        <i class="bi bi-cloud-arrow-up text-4xl text-slate-400 dark:text-slate-500 mb-2"></i>
+                        <p class="text-slate-600 dark:text-slate-400">Haz clic o arrastra fotos aquí</p>
+                        <input type="file" id="fotos" multiple accept="image/*" class="hidden">
                     </div>
+                    <div id="fileList" class="flex flex-wrap gap-4 mt-4"></div>
                 </div>
             </div>
-        </div>
+
+            <button type="submit" id="btnGuardar" class="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 shadow-lg shadow-blue-500/30">
+                <i class="bi bi-cloud-check"></i> Guardar Ficha Oficial
+            </button>
+        </form>
     </main>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, query, where, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBMcHFfBlG76ua3fVTOdpyXNXqXTooELf8",
@@ -236,12 +172,27 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
-        let empresasMap = {}; // Caché para nombres de empresas
+        let numeroFicha = '';
+        let equiposCargados = [];
+        let solicitantesCache = {};
 
-        // --- Utilidades UI ---
-        document.getElementById('themeToggle').addEventListener('click', () => document.documentElement.classList.toggle('dark'));
+        // Tema
+        const initTheme = () => {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        };
+        initTheme();
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
 
+        // Toasts
         window.mostrarToast = (mensaje, tipo = 'success') => {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -254,256 +205,213 @@
             setTimeout(() => { toast.classList.add('translate-x-full', 'opacity-0'); setTimeout(() => toast.remove(), 300); }, 3000);
         };
 
-        window.switchTab = (tab, colorCls) => {
-            document.querySelectorAll('.tab-btn').forEach(b => {
-                b.className = "tab-btn px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap";
-            });
-            document.querySelectorAll('.tab-section').forEach(s => s.classList.add('hidden'));
-            
-            const btn = document.getElementById(`tab-${tab}`);
-            btn.className = `tab-btn px-6 py-3 text-sm font-bold border-b-2 border-${colorCls}-600 text-${colorCls}-600 dark:text-${colorCls}-400 focus:outline-none transition-colors whitespace-nowrap`;
-            document.getElementById(`seccion-${tab}`).classList.remove('hidden');
-        };
+        // UI Setup
+        document.getElementById('fecha_solicitud').valueAsDate = new Date();
+        numeroFicha = new Date().toISOString().slice(0,10).replace(/-/g,'') + '-' + Math.floor(Math.random() * 900 + 100);
+        document.getElementById('display_numero_ficha').textContent = numeroFicha;
 
-        window.resetForm = (tipo, color) => {
-            document.getElementById(`form${tipo}`).reset();
-            document.getElementById(`${tipo.toLowerCase() === 'equipo' ? 'eq' : tipo.substring(0,3).toLowerCase()}Id`).value = '';
-            document.getElementById(`titulo-form-${tipo.toLowerCase()}`).innerText = `Nuevo ${tipo}`;
-            document.getElementById(`btnGuardar${tipo}`).innerHTML = '<i class="bi bi-save"></i> Guardar';
-            document.getElementById(`btnCancel${tipo}`).classList.add('hidden');
-        };
-
-        function setEditMode(tipo, id, datos, color) {
-            document.getElementById(`${tipo.toLowerCase() === 'equipo' ? 'eq' : tipo.substring(0,3).toLowerCase()}Id`).value = id;
-            document.getElementById(`titulo-form-${tipo.toLowerCase()}`).innerText = `Editar ${tipo}`;
-            document.getElementById(`btnGuardar${tipo}`).innerHTML = '<i class="bi bi-pencil-square"></i> Actualizar';
-            document.getElementById(`btnCancel${tipo}`).classList.remove('hidden');
-            
-            // Rellenar datos
-            for (const [key, value] of Object.entries(datos)) {
-                const el = document.getElementById(key);
-                if(el) el.value = value;
-            }
-        }
-
-        // --- Carga de Datos ---
         onAuthStateChanged(auth, (user) => { 
             if (!user) window.location.href = 'index.html'; 
-            else cargarTodosLosDatos(); 
+            else { cargarEmpresas(); cargarEquipos(); }
         });
 
-        async function cargarTodosLosDatos() {
-            await cargarEmpresas();
-            await cargarSucursales();
-            await cargarSolicitantes();
-            await cargarEquipos();
-        }
-
-        // --- EMPRESAS ---
+        // Cargas de DB
         async function cargarEmpresas() {
-            const snap = await getDocs(collection(db, "empresas"));
-            const lista = document.getElementById('listaEmpresas');
-            const selectSuc = document.getElementById('sucEmpresaId');
-            const selectSol = document.getElementById('solEmpresaId');
-            
-            lista.innerHTML = '';
-            selectSuc.innerHTML = '<option value="">Seleccione Empresa</option>';
-            selectSol.innerHTML = '<option value="">Seleccione Empresa</option>';
-            empresasMap = {};
-
-            snap.forEach(d => {
-                const data = d.data();
-                empresasMap[d.id] = data.nombre;
-                
-                // Llenar tabla
-                lista.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                        <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre}</td>
-                        <td class="p-4 text-right">
-                            <button onclick="editarEmpresaUI('${d.id}', '${data.nombre}')" class="text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 p-2 rounded transition"><i class="bi bi-pencil"></i></button>
-                            <button onclick="eliminarRegistro('empresas','${d.id}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded transition"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`;
-                
-                // Llenar selects
-                const opt = `<option value="${d.id}">${data.nombre}</option>`;
-                selectSuc.innerHTML += opt;
-                selectSol.innerHTML += opt;
-            });
+            try {
+                const snap = await getDocs(collection(db, "empresas"));
+                const select = document.getElementById('empresa_id');
+                select.innerHTML = '<option value="">Seleccionar empresa</option>';
+                snap.forEach(doc => select.innerHTML += `<option value="${doc.id}">${doc.data().nombre}</option>`);
+            } catch (e) { mostrarToast("Error al cargar empresas", "error"); }
         }
 
-        window.editarEmpresaUI = (id, nombre) => {
-            setEditMode('Empresa', id, { empNombre: nombre }, 'blue');
-            switchTab('empresas', 'blue');
-        };
-
-        document.getElementById('formEmpresa').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('empId').value;
-            const nom = document.getElementById('empNombre').value.trim();
-            try {
-                if(id) {
-                    await updateDoc(doc(db, "empresas", id), { nombre: nom });
-                    mostrarToast("Empresa actualizada");
-                } else {
-                    await addDoc(collection(db, "empresas"), { nombre: nom });
-                    mostrarToast("Empresa creada");
-                }
-                resetForm('Empresa', 'blue');
-                cargarTodosLosDatos(); // Recargar todo porque el nombre pudo cambiar
-            } catch(e) { mostrarToast(e.message, 'error'); }
-        });
-
-        // --- SUCURSALES ---
-        async function cargarSucursales() {
-            const snap = await getDocs(collection(db, "sucursales"));
-            const lista = document.getElementById('listaSucursales');
-            lista.innerHTML = '';
-            snap.forEach(d => {
-                const data = d.data();
-                lista.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                        <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre}</td>
-                        <td class="p-4 text-slate-500"><span class="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-xs">${empresasMap[data.empresa_id] || 'Desconocida'}</span></td>
-                        <td class="p-4 text-right">
-                            <button onclick="editarSucursalUI('${d.id}', '${data.empresa_id}', '${data.nombre}')" class="text-purple-500 hover:bg-purple-50 dark:hover:bg-purple-900/30 p-2 rounded transition"><i class="bi bi-pencil"></i></button>
-                            <button onclick="eliminarRegistro('sucursales','${d.id}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded transition"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        window.editarSucursalUI = (id, empId, nombre) => {
-            setEditMode('Sucursal', id, { sucEmpresaId: empId, sucNombre: nombre }, 'purple');
-            switchTab('sucursales', 'purple');
-        };
-
-        document.getElementById('formSucursal').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('sucId').value;
-            const empId = document.getElementById('sucEmpresaId').value;
-            const nom = document.getElementById('sucNombre').value.trim();
-            try {
-                if(id) {
-                    await updateDoc(doc(db, "sucursales", id), { empresa_id: empId, nombre: nom });
-                    mostrarToast("Sucursal actualizada");
-                } else {
-                    await addDoc(collection(db, "sucursales"), { empresa_id: empId, nombre: nom });
-                    mostrarToast("Sucursal creada");
-                }
-                resetForm('Sucursal', 'purple');
-                cargarSucursales();
-            } catch(e) { mostrarToast(e.message, 'error'); }
-        });
-
-        // --- SOLICITANTES ---
-        async function cargarSolicitantes() {
-            const snap = await getDocs(collection(db, "solicitantes"));
-            const lista = document.getElementById('listaSolicitantes');
-            lista.innerHTML = '';
-            snap.forEach(d => {
-                const data = d.data();
-                lista.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                        <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre} ${data.apellido}</td>
-                        <td class="p-4 text-slate-500">${data.correo}</td>
-                        <td class="p-4"><span class="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-xs text-slate-500">${empresasMap[data.empresa_id] || 'Desconocida'}</span></td>
-                        <td class="p-4 text-right">
-                            <button onclick="editarSolicitanteUI('${d.id}', '${data.empresa_id}', '${data.nombre}', '${data.apellido}', '${data.correo}')" class="text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/30 p-2 rounded transition"><i class="bi bi-pencil"></i></button>
-                            <button onclick="eliminarRegistro('solicitantes','${d.id}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded transition"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`;
-            });
-        }
-
-        window.editarSolicitanteUI = (id, empId, nombre, apellido, correo) => {
-            setEditMode('Solicitante', id, { solEmpresaId: empId, solNombre: nombre, solApellido: apellido, solCorreo: correo }, 'emerald');
-            switchTab('solicitantes', 'emerald');
-        };
-
-        document.getElementById('formSolicitante').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('solId').value;
-            const data = {
-                empresa_id: document.getElementById('solEmpresaId').value,
-                nombre: document.getElementById('solNombre').value.trim(),
-                apellido: document.getElementById('solApellido').value.trim(),
-                correo: document.getElementById('solCorreo').value.trim()
-            };
-            try {
-                if(id) {
-                    await updateDoc(doc(db, "solicitantes", id), data);
-                    mostrarToast("Solicitante actualizado");
-                } else {
-                    await addDoc(collection(db, "solicitantes"), data);
-                    mostrarToast("Solicitante creado");
-                }
-                resetForm('Solicitante', 'emerald');
-                cargarSolicitantes();
-            } catch(e) { mostrarToast(e.message, 'error'); }
-        });
-
-        // --- EQUIPOS ---
         async function cargarEquipos() {
-            const snap = await getDocs(collection(db, "equipos"));
-            const lista = document.getElementById('listaEquipos');
-            lista.innerHTML = '';
-            snap.forEach(d => {
-                const data = d.data();
-                lista.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                        <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre}</td>
-                        <td class="p-4 text-slate-500">${data.marca}</td>
-                        <td class="p-4 font-mono text-xs text-slate-400">${data.serie}</td>
-                        <td class="p-4 text-right">
-                            <button onclick="editarEquipoUI('${d.id}', '${data.nombre}', '${data.marca}', '${data.serie}')" class="text-orange-500 hover:bg-orange-50 dark:hover:bg-orange-900/30 p-2 rounded transition"><i class="bi bi-pencil"></i></button>
-                            <button onclick="eliminarRegistro('equipos','${d.id}')" class="text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 p-2 rounded transition"><i class="bi bi-trash"></i></button>
-                        </td>
-                    </tr>`;
+            try {
+                const snap = await getDocs(collection(db, "equipos"));
+                equiposCargados = [];
+                snap.forEach(doc => equiposCargados.push({ id: doc.id, ...doc.data() }));
+            } catch (e) { console.error(e); }
+        }
+
+        // Lógica Dependiente (Empresa -> Sucursales & Solicitantes)
+        document.getElementById('empresa_id').addEventListener('change', async (e) => {
+            const empId = e.target.value;
+            const selectSol = document.getElementById('solicitante_id');
+            const selectSuc = document.getElementById('sucursal_id');
+            
+            document.getElementById('seccion_correos').classList.add('hidden');
+            
+            if (!empId) {
+                selectSol.disabled = true; selectSuc.disabled = true;
+                selectSol.innerHTML = '<option value="">Selecciona una empresa primero</option>';
+                selectSuc.innerHTML = '<option value="">Selecciona una empresa primero</option>';
+                return;
+            }
+
+            selectSol.disabled = false; selectSuc.disabled = false;
+            selectSol.innerHTML = '<option value="">Cargando...</option>';
+            selectSuc.innerHTML = '<option value="">Cargando...</option>';
+
+            try {
+                // Sucursales
+                const qSuc = query(collection(db, "sucursales"), where("empresa_id", "==", empId));
+                const snapSuc = await getDocs(qSuc);
+                selectSuc.innerHTML = '<option value="">Seleccionar sucursal</option>';
+                snapSuc.forEach(doc => selectSuc.innerHTML += `<option value="${doc.id}">${doc.data().alias}</option>`);
+
+                // Solicitantes (Soporta Arrays)
+                const qSol = query(collection(db, "solicitantes"), where("empresas", "array-contains", empId));
+                const snapSol = await getDocs(qSol);
+                
+                selectSol.innerHTML = '<option value="">Seleccionar solicitante</option>';
+                solicitantesCache = {};
+                snapSol.forEach(doc => {
+                    const data = doc.data();
+                    solicitantesCache[doc.id] = data;
+                    selectSol.innerHTML += `<option value="${doc.id}">${data.nombre} ${data.apellido}</option>`;
+                });
+            } catch (error) {
+                mostrarToast("Error cargando dependencias", "error");
+            }
+        });
+
+        // Mostrar Correos al elegir solicitante
+        document.getElementById('solicitante_id').addEventListener('change', (e) => {
+            const solId = e.target.value;
+            const secCorreos = document.getElementById('seccion_correos');
+            const listaCorreos = document.getElementById('lista_correos');
+            listaCorreos.innerHTML = '';
+
+            if(!solId || !solicitantesCache[solId] || !solicitantesCache[solId].correos) {
+                secCorreos.classList.add('hidden');
+                return;
+            }
+
+            const correos = solicitantesCache[solId].correos;
+            if(correos.length > 0) {
+                correos.forEach(c => {
+                    listaCorreos.innerHTML += `
+                        <label class="flex items-center gap-2 p-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded cursor-pointer transition">
+                            <input type="checkbox" name="correos_envio" value="${c}" class="w-4 h-4 text-blue-600 rounded border-slate-300" checked>
+                            <span class="text-sm font-medium text-slate-700 dark:text-slate-300">${c}</span>
+                        </label>`;
+                });
+                secCorreos.classList.remove('hidden');
+            } else {
+                secCorreos.classList.add('hidden');
+            }
+        });
+
+        // Buscador Equipos
+        const inputBuscar = document.getElementById('buscar_equipo');
+        const sugerencias = document.getElementById('sugerencias_equipo');
+        inputBuscar.addEventListener('input', (e) => {
+            const txt = e.target.value.toLowerCase().trim();
+            sugerencias.innerHTML = '';
+            if (txt.length < 2) { sugerencias.classList.add('hidden'); return; }
+
+            const res = equiposCargados.filter(eq => 
+                (eq.nombre && eq.nombre.toLowerCase().includes(txt)) || 
+                (eq.codigo_interno && eq.codigo_interno.toLowerCase().includes(txt)) ||
+                (eq.serie && eq.serie.toLowerCase().includes(txt))
+            );
+
+            if (res.length > 0) {
+                res.forEach(eq => {
+                    const div = document.createElement('div');
+                    div.className = 'p-3 hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700 transition-colors';
+                    div.innerHTML = `<div class="font-bold text-slate-800 dark:text-white">${eq.codigo_interno} - ${eq.nombre}</div><div class="text-xs text-slate-500">Serie: ${eq.serie || 'N/A'}</div>`;
+                    div.onclick = () => {
+                        inputBuscar.value = eq.nombre;
+                        document.getElementById('equipo_codigo').value = eq.codigo_interno || '';
+                        document.getElementById('equipo_serie').value = eq.serie || '';
+                        sugerencias.classList.add('hidden');
+                    };
+                    sugerencias.appendChild(div);
+                });
+                sugerencias.classList.remove('hidden');
+            }
+        });
+        document.addEventListener('click', (e) => { if(!inputBuscar.contains(e.target)) sugerencias.classList.add('hidden'); });
+
+        // Fotos Drag&Drop
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fotos');
+        const fileList = document.getElementById('fileList');
+
+        dropzone.addEventListener('click', () => fileInput.click());
+        dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); fileInput.files = e.dataTransfer.files; mostrarMiniaturas(); });
+        fileInput.addEventListener('change', mostrarMiniaturas);
+
+        function mostrarMiniaturas() {
+            fileList.innerHTML = '';
+            Array.from(fileInput.files).forEach(f => {
+                if (!f.type.startsWith('image/')) return;
+                const r = new FileReader();
+                r.onload = (e) => {
+                    const img = document.createElement('img'); img.src = e.target.result; img.className = 'w-24 h-24 object-cover rounded-lg border border-slate-200 shadow-sm';
+                    fileList.appendChild(img);
+                };
+                r.readAsDataURL(f);
             });
         }
 
-        window.editarEquipoUI = (id, nombre, marca, serie) => {
-            setEditMode('Equipo', id, { eqNombre: nombre, eqMarca: marca, eqSerie: serie }, 'orange');
-            switchTab('equipos', 'orange');
-        };
-
-        document.getElementById('formEquipo').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('eqId').value;
-            const data = {
-                nombre: document.getElementById('eqNombre').value.trim(),
-                marca: document.getElementById('eqMarca').value.trim(),
-                serie: document.getElementById('eqSerie').value.trim()
-            };
-            try {
-                if(id) {
-                    await updateDoc(doc(db, "equipos", id), data);
-                    mostrarToast("Equipo actualizado");
-                } else {
-                    await addDoc(collection(db, "equipos"), data);
-                    mostrarToast("Equipo registrado");
-                }
-                resetForm('Equipo', 'orange');
-                cargarEquipos();
-            } catch(e) { mostrarToast(e.message, 'error'); }
-        });
-
-        // --- GLOBAL DELETE ---
-        window.eliminarRegistro = async (col, id) => {
-            if(confirm('¿Eliminar este registro permanentemente?')) {
-                try {
-                    await deleteDoc(doc(db, col, id));
-                    mostrarToast("Registro eliminado", "success");
-                    if(col === 'empresas') cargarTodosLosDatos();
-                    if(col === 'sucursales') cargarSucursales();
-                    if(col === 'solicitantes') cargarSolicitantes();
-                    if(col === 'equipos') cargarEquipos();
-                } catch(error) {
-                    mostrarToast(error.message, "error");
-                }
+        // Subir Fotos a Storage
+        async function subirFotos(files) {
+            const urls = [];
+            for (let i = 0; i < files.length; i++) {
+                const f = files[i];
+                const storageRef = ref(storage, `fichas/${numeroFicha}_${Date.now()}_${i}`);
+                const res = await uploadBytes(storageRef, f);
+                urls.push(await getDownloadURL(res.ref));
             }
-        };
+            return urls;
+        }
+
+        // Enviar Formulario
+        document.getElementById('fichaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardar');
+            btn.innerHTML = '<i class="bi bi-hourglass-split animate-spin"></i> Guardando Ficha...';
+            btn.disabled = true;
+
+            try {
+                const tareas = Array.from(document.querySelectorAll('input[name="tareas"]:checked')).map(cb => cb.value);
+                const correos = Array.from(document.querySelectorAll('input[name="correos_envio"]:checked')).map(cb => cb.value);
+                const tipoMtto = document.querySelector('input[name="tipo_mantenimiento"]:checked')?.value;
+                
+                // Subir imágenes si existen
+                let fotosUrls = [];
+                if (fileInput.files.length > 0) {
+                    fotosUrls = await subirFotos(fileInput.files);
+                }
+
+                const data = {
+                    numero_ficha: "MTTO-" + numeroFicha,
+                    fecha_solicitud: document.getElementById('fecha_solicitud').value,
+                    empresa_id: document.getElementById('empresa_id').value,
+                    solicitante_id: document.getElementById('solicitante_id').value,
+                    sucursal_id: document.getElementById('sucursal_id').value,
+                    correos_notificar: correos,
+                    equipo_codigo: document.getElementById('equipo_codigo').value,
+                    tipo: tipoMtto,
+                    tareas: tareas,
+                    observaciones: document.getElementById('observaciones').value,
+                    fotos: fotosUrls,
+                    timestamp: serverTimestamp()
+                };
+
+                await addDoc(collection(db, "fichas_mantenimiento"), data);
+                mostrarToast("Ficha guardada correctamente", "success");
+                setTimeout(() => window.location.href = "dashboard.html", 1500);
+            } catch (error) {
+                mostrarToast("Error al guardar: " + error.message, "error");
+                btn.innerHTML = '<i class="bi bi-cloud-check"></i> Guardar Ficha Oficial';
+                btn.disabled = false;
+            }
+        });
     </script>
 </body>
 </html>

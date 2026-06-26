@@ -9,10 +9,11 @@
         tailwind.config = { darkMode: 'class' }
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 font-sans">
 
-    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors">
+    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors sticky top-0 z-50">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <img src="img/logo.png" alt="Logo" class="h-10 w-auto bg-white rounded p-1">
@@ -30,70 +31,73 @@
         </div>
     </nav>
 
-    <div class="container mx-auto p-6 mt-4">
+    <div class="container mx-auto p-6 mt-4 max-w-7xl">
         <div class="mb-8">
             <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Dashboard Operativo</h1>
-            <p class="text-slate-500 dark:text-slate-400 text-sm">Resumen de actividad y gestión de mantenimiento.</p>
+            <p class="text-slate-500 dark:text-slate-400 text-sm">Visión general del estado de los servicios INELRED.</p>
         </div>
         
-        <!-- KPIs Informativos -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                <p class="text-xs font-semibold text-slate-400 uppercase">Total Fichas</p>
-                <h3 class="text-3xl font-extrabold text-slate-900 dark:text-white mt-1" id="kpi-total">0</h3>
-            </div>
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                <p class="text-xs font-semibold text-slate-400 uppercase">Preventivos</p>
-                <h3 class="text-3xl font-extrabold text-blue-600 dark:text-blue-400 mt-1" id="kpi-prev">0</h3>
-            </div>
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                <p class="text-xs font-semibold text-slate-400 uppercase">Correctivos</p>
-                <h3 class="text-3xl font-extrabold text-orange-600 dark:text-orange-400 mt-1" id="kpi-corr">0</h3>
-            </div>
-            <div class="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
-                <p class="text-xs font-semibold text-slate-400 uppercase">Reactivos</p>
-                <h3 class="text-3xl font-extrabold text-red-600 dark:text-red-400 mt-1" id="kpi-react">0</h3>
-            </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <a href="mantenimiento.html" class="block bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-blue-500 transition-all group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase">Fichas Mtto</p>
+                        <h3 class="text-3xl font-extrabold text-blue-600 dark:text-blue-400 mt-1" id="kpi-mtto">0</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-blue-50 dark:bg-blue-900/30 text-blue-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="bi bi-tools"></i>
+                    </div>
+                </div>
+            </a>
+            <a href="mejoras.html" class="block bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-green-500 transition-all group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase">Mejoras</p>
+                        <h3 class="text-3xl font-extrabold text-green-600 dark:text-green-400 mt-1" id="kpi-mejoras">0</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-green-50 dark:bg-green-900/30 text-green-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="bi bi-wrench-adjustable"></i>
+                    </div>
+                </div>
+            </a>
+            <a href="reactivos.html" class="block bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-red-500 transition-all group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase">Emergencias</p>
+                        <h3 class="text-3xl font-extrabold text-red-600 dark:text-red-400 mt-1" id="kpi-reactivos">0</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-red-50 dark:bg-red-900/30 text-red-600 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                </div>
+            </a>
+            <a href="configuracion.html" class="block bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-slate-500 transition-all group">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="text-xs font-semibold text-slate-400 uppercase">Maestros</p>
+                        <h3 class="text-sm font-bold text-slate-700 dark:text-slate-300 mt-3">Configuración</h3>
+                    </div>
+                    <div class="w-10 h-10 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-lg flex items-center justify-center group-hover:rotate-90 transition-transform">
+                        <i class="bi bi-gear"></i>
+                    </div>
+                </div>
+            </a>
         </div>
 
-        <!-- Módulos de Acción -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
-            <!-- Mantenimiento -->
-            <a href="mantenimiento.html" class="block bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-blue-600 dark:hover:border-blue-500 transition-all duration-200 cursor-pointer">
-                <div class="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg flex items-center justify-center mb-4">
-                    <i class="bi bi-tools text-xl"></i>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <h3 class="text-lg font-bold mb-4 text-slate-800 dark:text-slate-200">Tipos de Mantenimiento Realizados</h3>
+                <div class="relative h-64 w-full">
+                    <canvas id="chartMtto"></canvas>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Mantenimiento</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Registrar fichas preventivas y correctivas.</p>
-            </a>
+            </div>
 
-            <!-- Mejoras -->
-            <a href="mejoras.html" class="block bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-green-600 dark:hover:border-green-500 transition-all duration-200 cursor-pointer">
-                <div class="w-12 h-12 bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-lg flex items-center justify-center mb-4">
-                    <i class="bi bi-wrench-adjustable text-xl"></i>
+            <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                <h3 class="text-lg font-bold mb-4 text-slate-800 dark:text-slate-200">Estado Global (Mejoras y Reactivos)</h3>
+                <div class="relative h-64 w-full flex justify-center">
+                    <canvas id="chartEstados"></canvas>
                 </div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Mejoras</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Gestión de mejoras de instalación.</p>
-            </a>
-
-            <!-- Reactivos -->
-            <a href="reactivos.html" class="block bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-yellow-600 dark:hover:border-yellow-500 transition-all duration-200 cursor-pointer">
-                <div class="w-12 h-12 bg-yellow-50 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-400 rounded-lg flex items-center justify-center mb-4">
-                    <i class="bi bi-exclamation-triangle text-xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Reactivos</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Atención de emergencias críticas.</p>
-            </a>
-
-            <!-- Configuración -->
-            <a href="configuracion.html" class="block bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 hover:border-gray-600 dark:hover:border-gray-500 transition-all duration-200 cursor-pointer">
-                <div class="w-12 h-12 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-lg flex items-center justify-center mb-4">
-                    <i class="bi bi-gear text-xl"></i>
-                </div>
-                <h3 class="text-lg font-bold text-slate-900 dark:text-white">Configuración</h3>
-                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">Equipos, Sucursales y Usuarios.</p>
-            </a>
+            </div>
         </div>
     </div>
 
@@ -115,43 +119,128 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Lógica de cambio de tema
-        const themeToggle = document.getElementById('themeToggle');
-        themeToggle.addEventListener('click', () => {
+        // Variables Globales para Gráficos
+        let chartMttoInstancia = null;
+        let chartEstadosInstancia = null;
+
+        // Tema
+        const initTheme = () => { if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); };
+        initTheme();
+        
+        document.getElementById('themeToggle').addEventListener('click', () => {
             document.documentElement.classList.toggle('dark');
             localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+            renderizarGraficos(); // Redibujar con los colores correctos
         });
 
-        // Carga inicial del tema
-        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        // Configuración de colores globales de Chart.js
+        Chart.defaults.font.family = "'Segoe UI', sans-serif";
 
-        async function cargarEstadisticas() {
+        async function cargarDatosDashboard() {
             try {
-                const snapshot = await getDocs(collection(db, "fichas_mantenimiento"));
-                let total = 0, prev = 0, corr = 0, react = 0;
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    total++;
-                    if (data.tipo === 'preventivo') prev++;
-                    else if (data.tipo === 'correctivo') corr++;
-                    else if (data.tipo === 'reactivo') react++;
+                // Consultas en paralelo para mayor velocidad
+                const [snapMtto, snapMejoras, snapReactivos] = await Promise.all([
+                    getDocs(collection(db, "fichas_mantenimiento")),
+                    getDocs(collection(db, "fichas_mejoras")),
+                    getDocs(collection(db, "fichas_reactivos"))
+                ]);
+
+                // Actualizar KPIs de las tarjetas
+                document.getElementById('kpi-mtto').textContent = snapMtto.size;
+                document.getElementById('kpi-mejoras').textContent = snapMejoras.size;
+                document.getElementById('kpi-reactivos').textContent = snapReactivos.size;
+
+                // Procesar datos para Gráfico 1 (Mantenimiento)
+                window.datosMtto = { preventivo: 0, correctivo: 0, otros: 0 };
+                snapMtto.forEach(doc => {
+                    const tipo = doc.data().tipo_mantenimiento;
+                    if(tipo === 'preventivo') window.datosMtto.preventivo++;
+                    else if(tipo === 'correctivo') window.datosMtto.correctivo++;
+                    else window.datosMtto.otros++;
                 });
-                document.getElementById('kpi-total').textContent = total;
-                document.getElementById('kpi-prev').textContent = prev;
-                document.getElementById('kpi-corr').textContent = corr;
-                document.getElementById('kpi-react').textContent = react;
-            } catch (error) { console.error("Error al cargar estadísticas:", error); }
+
+                // Procesar datos para Gráfico 2 (Estados Globales)
+                window.datosEstados = { pendiente: 0, proceso: 0, completado: 0 };
+                const contarEstado = (doc) => {
+                    const estado = doc.data().estado || 'pendiente';
+                    if(estado === 'pendiente' || estado === 'activo') window.datosEstados.pendiente++;
+                    else if(estado === 'en_progreso' || estado === 'en_atencion') window.datosEstados.proceso++;
+                    else window.datosEstados.completado++;
+                };
+                snapMejoras.forEach(contarEstado);
+                snapReactivos.forEach(contarEstado);
+
+                renderizarGraficos();
+
+            } catch (error) {
+                console.error("Error al cargar datos del dashboard:", error);
+            }
         }
 
+        function renderizarGraficos() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#cbd5e1' : '#475569';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+            // Destruir instancias previas si existen para evitar solapamientos
+            if (chartMttoInstancia) chartMttoInstancia.destroy();
+            if (chartEstadosInstancia) chartEstadosInstancia.destroy();
+
+            // Gráfico de Barras: Mantenimiento
+            const ctxMtto = document.getElementById('chartMtto').getContext('2d');
+            chartMttoInstancia = new Chart(ctxMtto, {
+                type: 'bar',
+                data: {
+                    labels: ['Preventivo', 'Correctivo', 'Otros'],
+                    datasets: [{
+                        label: 'Cantidad de Fichas',
+                        data: [window.datosMtto.preventivo, window.datosMtto.correctivo, window.datosMtto.otros],
+                        backgroundColor: ['#3b82f6', '#f97316', '#94a3b8'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { ticks: { color: textColor, stepSize: 1 }, grid: { color: gridColor } },
+                        x: { ticks: { color: textColor }, grid: { display: false } }
+                    }
+                }
+            });
+
+            // Gráfico de Anillo: Estados
+            const ctxEst = document.getElementById('chartEstados').getContext('2d');
+            chartEstadosInstancia = new Chart(ctxEst, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Pendientes / Activos', 'En Proceso', 'Resueltos'],
+                    datasets: [{
+                        data: [window.datosEstados.pendiente, window.datosEstados.proceso, window.datosEstados.completado],
+                        backgroundColor: ['#ef4444', '#eab308', '#22c55e'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { color: textColor, padding: 20 } }
+                    },
+                    cutout: '70%'
+                }
+            });
+        }
+
+        // Auth Listener
         onAuthStateChanged(auth, (user) => {
             if (!user) window.location.href = 'index.html';
-            else cargarEstadisticas();
+            else cargarDatosDashboard();
         });
 
+        // Logout
         document.getElementById('btnCerrarSesion').addEventListener('click', () => {
             signOut(auth).then(() => window.location.href = 'index.html');
         });

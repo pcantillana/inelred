@@ -9,18 +9,24 @@
         tailwind.config = { darkMode: 'class' }
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 transition-colors duration-300 font-sans">
 
-    <!-- Navbar Consistente -->
-    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors sticky top-0 z-50">
+    <div id="toastContainer" class="fixed top-5 right-5 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+    <nav class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 transition-colors sticky top-0 z-40">
         <div class="container mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <a href="dashboard.html" class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition">
                     <i class="bi bi-arrow-left text-xl"></i>
                 </a>
-                <img src="img/logo.png" alt="Logo" class="h-8 w-auto bg-white rounded p-1">
-                <span class="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider hidden md:block">Configuración de Maestros</span>
+                <span class="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider hidden md:block">
+                    <i class="bi bi-gear-fill mr-1"></i> Administración Maestra (CRUD Completo)
+                </span>
             </div>
             <button id="themeToggle" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                 <i class="bi bi-moon-fill dark:hidden"></i>
@@ -29,120 +35,192 @@
         </div>
     </nav>
 
-    <!-- Contenido Principal -->
-    <main class="container mx-auto p-4 md:p-6 max-w-7xl">
-        <div class="mb-6">
-            <h1 class="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <i class="bi bi-gear-fill text-slate-400"></i> Ajustes del Sistema
-            </h1>
-        </div>
-
-        <!-- Sistema de Tabs -->
-        <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6">
-            <button id="tab-empresas" class="px-6 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 focus:outline-none transition-colors" onclick="switchTab('empresas')">
+    <main class="container mx-auto p-4 md:p-6 max-w-[1400px]">
+        
+        <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6 overflow-x-auto hide-scrollbar">
+            <button id="tab-empresas" class="px-6 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('empresas')">
                 <i class="bi bi-building mr-2"></i>Empresas
             </button>
-            <button id="tab-solicitantes" class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none transition-colors" onclick="switchTab('solicitantes')">
-                <i class="bi bi-people mr-2"></i>Solicitantes
+            <button id="tab-sucursales" class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('sucursales')">
+                <i class="bi bi-shop mr-2"></i>Sucursales
+            </button>
+            <button id="tab-solicitantes" class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('solicitantes')">
+                <i class="bi bi-people mr-2"></i>Contratistas
+            </button>
+            <button id="tab-codigos" class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('codigos')">
+                <i class="bi bi-tags mr-2"></i>Catálogos (A-Z)
+            </button>
+            <button id="tab-equipos" class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap" onclick="switchTab('equipos')">
+                <i class="bi bi-tools mr-2"></i>Equipos
             </button>
         </div>
 
-        <!-- ==================== SECCIÓN EMPRESAS ==================== -->
-        <div id="seccion-empresas" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Formulario Empresas -->
-            <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
-                        <i class="bi bi-plus-circle text-blue-500"></i> Nueva Empresa
-                    </h2>
+        <div id="seccion-empresas" class="tab-section grid grid-cols-1 xl:grid-cols-3 gap-6">
+            <div class="xl:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 relative">
+                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 text-blue-500" id="titulo-form-empresa">Nueva Empresa</h2>
                     <form id="formEmpresa" class="space-y-4">
+                        <input type="hidden" id="empresaEditId">
                         <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre de la Empresa</label>
-                            <input type="text" id="nombreEmpresa" placeholder="Ej: TechCorp S.A." class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" required>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Nombre de la Empresa *</label>
+                            <input type="text" id="empNombre" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 transition" required>
                         </div>
-                        <button type="submit" id="btnGuardarEmpresa" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition flex items-center justify-center gap-2">
-                            <i class="bi bi-save"></i> Guardar Empresa
-                        </button>
+                        <div class="flex gap-2">
+                            <button type="button" id="btnCancelarEmpresa" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" onclick="cancelarEdicion('Empresa')">Cancelar</button>
+                            <button type="submit" id="btnGuardarEmpresa" class="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-bold hover:bg-blue-700 transition">Guardar</button>
+                        </div>
                     </form>
                 </div>
             </div>
-
-            <!-- Tabla Empresas -->
-            <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
-                                <tr>
-                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">ID</th>
-                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Nombre de Empresa</th>
-                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="listaEmpresas" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
-                                <tr><td colspan="3" class="p-4 text-center text-slate-500">Cargando datos...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <div class="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <table class="w-full text-left text-sm"><tbody id="listaEmpresas" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table>
             </div>
         </div>
 
-        <!-- ==================== SECCIÓN SOLICITANTES ==================== -->
-        <div id="seccion-solicitantes" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-            <!-- Formulario Solicitantes -->
-            <div class="lg:col-span-1">
-                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 transition-colors">
-                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 flex items-center gap-2">
-                        <i class="bi bi-person-plus text-emerald-500"></i> Nuevo Solicitante
-                    </h2>
-                    <form id="formSolicitante" class="space-y-4">
+        <div id="seccion-sucursales" class="tab-section grid grid-cols-1 xl:grid-cols-3 gap-6 hidden">
+            <div class="xl:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 text-purple-500" id="titulo-form-sucursal">Nueva Sucursal</h2>
+                    <form id="formSucursal" class="space-y-4">
+                        <input type="hidden" id="sucursalEditId">
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Empresa *</label>
+                            <select id="sucEmpresa" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition" required></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Alias (Ej: Finning - Lo Boza) *</label>
+                            <input type="text" id="sucAlias" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Dirección</label>
+                            <input type="text" id="sucDir" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition">
+                        </div>
                         <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Nombre</label>
-                                <input type="text" id="solNombre" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Apellido</label>
-                                <input type="text" id="solApellido" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
-                            </div>
+                            <div><label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Comuna</label><input type="text" id="sucComuna" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition"></div>
+                            <div><label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Región</label><input type="text" id="sucRegion" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition"></div>
                         </div>
                         <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Correo Electrónico</label>
-                            <input type="email" id="solCorreo" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">País</label>
+                            <input type="text" id="sucPais" value="Chile" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-purple-500 transition">
                         </div>
-                        <div>
-                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresa a la que pertenece</label>
-                            <select id="solEmpresaId" class="w-full p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" required>
-                                <option value="">Cargando empresas...</option>
-                            </select>
+                        <div class="flex gap-2">
+                            <button type="button" id="btnCancelarSucursal" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" onclick="cancelarEdicion('Sucursal')">Cancelar</button>
+                            <button type="submit" id="btnGuardarSucursal" class="flex-1 bg-purple-600 text-white py-2.5 rounded-lg font-bold hover:bg-purple-700 transition">Guardar</button>
                         </div>
-                        <button type="submit" id="btnGuardarSolicitante" class="w-full bg-emerald-600 text-white py-3 rounded-lg font-bold hover:bg-emerald-700 transition flex items-center justify-center gap-2">
-                            <i class="bi bi-save"></i> Guardar Solicitante
-                        </button>
                     </form>
                 </div>
             </div>
+            <div class="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <table class="w-full text-left text-sm"><tbody id="listaSucursales" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table>
+            </div>
+        </div>
 
-            <!-- Tabla Solicitantes -->
-            <div class="lg:col-span-2">
-                <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-colors">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800 text-xs uppercase text-slate-500 dark:text-slate-400">
-                                <tr>
-                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Nombre Completo</th>
-                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Correo</th>
-                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700">Empresa</th>
-                                    <th class="p-4 border-b border-slate-200 dark:border-slate-700 text-right">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="listaSolicitantes" class="divide-y divide-slate-100 dark:divide-slate-800 text-sm">
-                                <tr><td colspan="4" class="p-4 text-center text-slate-500">Cargando datos...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
+        <div id="seccion-solicitantes" class="tab-section grid grid-cols-1 xl:grid-cols-3 gap-6 hidden">
+            <div class="xl:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 text-emerald-500" id="titulo-form-solicitante">Nuevo Contratista</h2>
+                    <form id="formSolicitante" class="space-y-4">
+                        <input type="hidden" id="solicitanteEditId">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Nombres *</label><input type="text" id="solNombre" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 transition" required></div>
+                            <div><label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Apellidos *</label><input type="text" id="solApellido" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 transition" required></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Correos (Separados por coma) *</label>
+                            <textarea id="solCorreos" rows="2" placeholder="ej: contacto@mail.com, admin@mail.com" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-emerald-500 transition" required></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-2">Empresas Asociadas *</label>
+                            <div id="checkEmpresas" class="max-h-40 overflow-y-auto bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-3 space-y-2">
+                                <!-- Checkboxes dinámicos se generan aquí -->
+                            </div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" id="btnCancelarSolicitante" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" onclick="cancelarEdicion('Solicitante')">Cancelar</button>
+                            <button type="submit" id="btnGuardarSolicitante" class="flex-1 bg-emerald-600 text-white py-2.5 rounded-lg font-bold hover:bg-emerald-700 transition">Guardar</button>
+                        </div>
+                    </form>
                 </div>
+            </div>
+            <div class="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <table class="w-full text-left text-sm"><tbody id="listaSolicitantes" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table>
+            </div>
+        </div>
+
+        <div id="seccion-codigos" class="tab-section grid grid-cols-1 xl:grid-cols-3 gap-6 hidden">
+            <div class="xl:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 text-pink-500" id="titulo-form-categoria">Nueva Categoría (A-Z)</h2>
+                    <form id="formCategoria" class="space-y-4">
+                        <input type="hidden" id="categoriaEditId">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Letra *</label>
+                                <select id="catLetra" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-pink-500 transition" required></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Sub-código *</label>
+                                <input type="text" id="catSubcodigo" placeholder="Ej: EL" maxlength="3" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-pink-500 transition uppercase" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Nombre Categoría *</label>
+                            <input type="text" id="catNombre" placeholder="Ej: Tableros Eléctricos" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-pink-500 transition" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Descripción</label>
+                            <textarea id="catDesc" rows="2" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-pink-500 transition"></textarea>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" id="btnCancelarCategoria" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" onclick="cancelarEdicion('Categoria')">Cancelar</button>
+                            <button type="submit" id="btnGuardarCategoria" class="flex-1 bg-pink-600 text-white py-2.5 rounded-lg font-bold hover:bg-pink-700 transition">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <table class="w-full text-left text-sm"><tbody id="listaCategorias" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table>
+            </div>
+        </div>
+
+        <div id="seccion-equipos" class="tab-section grid grid-cols-1 xl:grid-cols-3 gap-6 hidden">
+            <div class="xl:col-span-1">
+                <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
+                    <h2 class="text-lg font-bold mb-4 border-b border-slate-100 dark:border-slate-800 pb-2 text-orange-500" id="titulo-form-equipo">Nuevo Equipo</h2>
+                    <form id="formEquipo" class="space-y-4">
+                        <input type="hidden" id="equipoEditId">
+                        <input type="hidden" id="equipoCodInterno"> <!-- Retiene el código al editar -->
+                        <input type="hidden" id="equipoOldImg"> <!-- Retiene la imagen antigua -->
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Categoría (A-Z) *</label>
+                            <select id="eqCategoria" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 transition" required></select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Nombre del Equipo *</label>
+                            <input type="text" id="eqNombre" placeholder="Ej: Motor Trifásico" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 transition" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Marca</label><input type="text" id="eqMarca" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 transition"></div>
+                            <div><label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Modelo</label><input type="text" id="eqModelo" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 transition"></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">N° Serie</label>
+                            <input type="text" id="eqSerie" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-orange-500 transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">Fotografía (Storage)</label>
+                            <input type="file" id="eqFoto" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="button" id="btnCancelarEquipo" class="hidden flex-1 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 py-2.5 rounded-lg font-bold hover:bg-slate-300 transition" onclick="cancelarEdicion('Equipo')">Cancelar</button>
+                            <button type="submit" id="btnGuardarEquipo" class="flex-1 bg-orange-600 text-white py-2.5 rounded-lg font-bold hover:bg-orange-700 transition">Guardar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="xl:col-span-2 bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <table class="w-full text-left text-sm"><tbody id="listaEquipos" class="divide-y divide-slate-100 dark:divide-slate-800"></tbody></table>
             </div>
         </div>
     </main>
@@ -150,193 +228,284 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, query, where } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBMcHFfBlG76ua3fVTOdpyXNXqXTooELf8",
-            authDomain: "inelred-e8f50.firebaseapp.com",
-            projectId: "inelred-e8f50",
-            storageBucket: "inelred-e8f50.firebasestorage.app",
-            messagingSenderId: "412934833273",
-            appId: "1:412934833273:web:734337299e2557ed8f40a8"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyBMcHFfBlG76ua3fVTOdpyXNXqXTooELf8", authDomain: "inelred-e8f50.firebaseapp.com", projectId: "inelred-e8f50", storageBucket: "inelred-e8f50.firebasestorage.app", messagingSenderId: "412934833273", appId: "1:412934833273:web:734337299e2557ed8f40a8" };
+        
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
-        // Mapas globales para relacionar IDs con nombres
-        let empresasMap = {};
+        // Memoria local para agilizar Ediciones y cruces de datos
+        let dbMem = { empresas: {}, sucursales: {}, solicitantes: {}, categorias: {}, equipos: {} };
 
-        // Control de UI (Tema y Tabs)
-        document.getElementById('themeToggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-        });
+        // ================= UTILIDADES UI =================
+        const initTheme = () => { if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); };
+        initTheme();
+        document.getElementById('themeToggle').addEventListener('click', () => { document.documentElement.classList.toggle('dark'); localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light'; });
 
-        window.switchTab = (tab) => {
-            // Estilos de botones
-            const btnEmp = document.getElementById('tab-empresas');
-            const btnSol = document.getElementById('tab-solicitantes');
-            
-            if (tab === 'empresas') {
-                btnEmp.className = "px-6 py-3 text-sm font-bold border-b-2 border-blue-600 text-blue-600 dark:text-blue-400 focus:outline-none transition-colors";
-                btnSol.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none transition-colors";
-                document.getElementById('seccion-empresas').classList.remove('hidden');
-                document.getElementById('seccion-solicitantes').classList.add('hidden');
-            } else {
-                btnSol.className = "px-6 py-3 text-sm font-bold border-b-2 border-emerald-600 text-emerald-600 dark:text-emerald-400 focus:outline-none transition-colors";
-                btnEmp.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300 focus:outline-none transition-colors";
-                document.getElementById('seccion-solicitantes').classList.remove('hidden');
-                document.getElementById('seccion-empresas').classList.add('hidden');
-            }
+        window.switchTab = (tabId) => {
+            document.querySelectorAll('.tab-section').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`seccion-${tabId}`).classList.remove('hidden');
+            const tabs = ['empresas', 'sucursales', 'solicitantes', 'codigos', 'equipos'];
+            const colors = { empresas: 'blue', sucursales: 'purple', solicitantes: 'emerald', codigos: 'pink', equipos: 'orange' };
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if(t === tabId) btn.className = `px-6 py-3 text-sm font-bold border-b-2 border-${colors[t]}-600 text-${colors[t]}-600 dark:text-${colors[t]}-400 focus:outline-none transition-colors whitespace-nowrap`;
+                else btn.className = "px-6 py-3 text-sm font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 focus:outline-none transition-colors whitespace-nowrap";
+            });
         };
 
-        // Seguridad y Carga Inicial
-        onAuthStateChanged(auth, (user) => { 
-            if (!user) window.location.href = 'index.html'; 
-            else {
-                cargarEmpresas();
-            }
-        });
+        window.mostrarToast = (mensaje, tipo = 'success') => {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `${tipo === 'success' ? 'bg-emerald-600' : 'bg-red-600'} text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3`;
+            toast.innerHTML = `<span>${mensaje}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        };
 
-        // ================= EMPRESAS =================
+        // Llenar select A-Z para Categorías
+        const catLetra = document.getElementById('catLetra');
+        for (let i = 65; i <= 90; i++) catLetra.innerHTML += `<option value="${String.fromCharCode(i)}">${String.fromCharCode(i)}</option>`;
+
+        // ================= CARGA PRINCIPAL =================
+        onAuthStateChanged(auth, (user) => { if (!user) window.location.href = 'index.html'; else cargarTodo(); });
+
+        async function cargarTodo() {
+            await Promise.all([cargarEmpresas(), cargarCategorias()]); // Dependencias Base
+            cargarSucursales();
+            cargarSolicitantes();
+            cargarEquipos();
+        }
+
+        // ================= MÓDULO 1: EMPRESAS =================
         async function cargarEmpresas() {
-            try {
-                const snap = await getDocs(collection(db, "empresas"));
-                const lista = document.getElementById('listaEmpresas');
-                const selectSol = document.getElementById('solEmpresaId');
-                
-                lista.innerHTML = '';
-                selectSol.innerHTML = '<option value="">Seleccionar empresa...</option>';
-                empresasMap = {}; // Resetear mapa
-                
-                if(snap.empty) {
-                    lista.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-slate-500">No hay empresas registradas</td></tr>';
-                }
-
-                snap.forEach(documento => {
-                    const data = documento.data();
-                    empresasMap[documento.id] = data.nombre; // Guardar en el diccionario
-
-                    // Llenar tabla
-                    lista.innerHTML += `
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                            <td class="p-4 font-mono text-slate-400">${documento.id.slice(-6)}</td>
-                            <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre}</td>
-                            <td class="p-4 text-right">
-                                <button onclick="eliminarRegistro('empresas', '${documento.id}')" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-
-                    // Llenar select del formulario de solicitantes
-                    selectSol.innerHTML += `<option value="${documento.id}">${data.nombre}</option>`;
-                });
-
-                // Una vez cargadas las empresas, cargar los solicitantes para poder cruzar los nombres
-                cargarSolicitantes();
-            } catch (error) {
-                console.error("Error al cargar empresas:", error);
-            }
-        }
-
-        document.getElementById('formEmpresa').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const input = document.getElementById('nombreEmpresa');
-            const btn = document.getElementById('btnGuardarEmpresa');
+            const snap = await getDocs(collection(db, "empresas"));
+            const lista = document.getElementById('listaEmpresas');
+            const selSuc = document.getElementById('sucEmpresa');
+            const chkSol = document.getElementById('checkEmpresas'); // Checkboxes para contratistas
             
-            if(!input.value.trim()) return;
+            lista.innerHTML = ''; selSuc.innerHTML = '<option value="">Seleccione Empresa</option>'; chkSol.innerHTML = '';
+            dbMem.empresas = {};
 
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
-
-            try {
-                await addDoc(collection(db, "empresas"), { nombre: input.value.trim() });
-                input.value = '';
-                cargarEmpresas();
-            } catch (error) {
-                alert("Error al guardar: " + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-save"></i> Guardar Empresa';
-            }
+            snap.forEach(doc => {
+                const d = doc.data(); dbMem.empresas[doc.id] = d;
+                lista.innerHTML += `<tr><td class="p-4 font-medium">${d.nombre}</td><td class="p-4 text-right whitespace-nowrap">
+                    <button onclick="prepararEdicion('Empresa', '${doc.id}')" class="text-blue-500 hover:text-blue-700 mr-3"><i class="bi bi-pencil-square"></i></button>
+                    <button onclick="eliminarDoc('empresas','${doc.id}')" class="text-red-500 hover:text-red-700"><i class="bi bi-trash"></i></button>
+                </td></tr>`;
+                selSuc.innerHTML += `<option value="${doc.id}">${d.nombre}</option>`;
+                chkSol.innerHTML += `<label class="flex items-center gap-2 mb-1"><input type="checkbox" id="chk_emp_${doc.id}" name="empAsociada" value="${doc.id}" class="rounded border-slate-300"> <span class="text-sm">${d.nombre}</span></label>`;
+            });
+        }
+        document.getElementById('formEmpresa').addEventListener('submit', async (e) => { 
+            e.preventDefault(); 
+            const id = document.getElementById('empresaEditId').value;
+            const data = { nombre: document.getElementById('empNombre').value };
+            
+            if(id) { await updateDoc(doc(db, "empresas", id), data); mostrarToast("Empresa Actualizada"); }
+            else { await addDoc(collection(db, "empresas"), data); mostrarToast("Empresa Creada"); }
+            
+            cancelarEdicion('Empresa'); cargarTodo(); 
         });
 
-        // ================= SOLICITANTES =================
-        async function cargarSolicitantes() {
-            try {
-                const snap = await getDocs(collection(db, "solicitantes"));
-                const lista = document.getElementById('listaSolicitantes');
-                lista.innerHTML = '';
-
-                if(snap.empty) {
-                    lista.innerHTML = '<tr><td colspan="4" class="p-4 text-center text-slate-500">No hay solicitantes registrados</td></tr>';
-                    return;
-                }
-
-                snap.forEach(documento => {
-                    const data = documento.data();
-                    const nombreEmpresa = empresasMap[data.empresa_id] || '<span class="text-red-500">Empresa no encontrada</span>';
-
-                    lista.innerHTML += `
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition">
-                            <td class="p-4 font-bold text-slate-700 dark:text-slate-200">${data.nombre} ${data.apellido}</td>
-                            <td class="p-4 text-slate-600 dark:text-slate-400">${data.correo}</td>
-                            <td class="p-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">${nombreEmpresa}</span></td>
-                            <td class="p-4 text-right">
-                                <button onclick="eliminarRegistro('solicitantes', '${documento.id}')" class="text-red-500 hover:text-red-700 p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition" title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </td>
-                        </tr>
-                    `;
-                });
-            } catch (error) {
-                console.error("Error al cargar solicitantes:", error);
-            }
+        // ================= MÓDULO 2: SUCURSALES =================
+        async function cargarSucursales() {
+            const snap = await getDocs(collection(db, "sucursales"));
+            const lista = document.getElementById('listaSucursales'); lista.innerHTML = '';
+            dbMem.sucursales = {};
+            snap.forEach(docSnap => {
+                const d = docSnap.data(); dbMem.sucursales[docSnap.id] = d;
+                const emp = dbMem.empresas[d.empresa_id]?.nombre || 'N/A';
+                lista.innerHTML += `<tr><td class="p-4 font-medium text-purple-600 dark:text-purple-400">${d.alias}</td><td class="p-4 text-slate-500">${emp}</td><td class="p-4 text-slate-500">${d.comuna || ''}</td><td class="p-4 text-right whitespace-nowrap">
+                    <button onclick="prepararEdicion('Sucursal', '${docSnap.id}')" class="text-blue-500 hover:text-blue-700 mr-3"><i class="bi bi-pencil-square"></i></button>
+                    <button onclick="eliminarDoc('sucursales','${docSnap.id}')" class="text-red-500"><i class="bi bi-trash"></i></button>
+                </td></tr>`;
+            });
         }
+        document.getElementById('formSucursal').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('sucursalEditId').value;
+            const data = {
+                empresa_id: document.getElementById('sucEmpresa').value, alias: document.getElementById('sucAlias').value,
+                direccion: document.getElementById('sucDir').value, comuna: document.getElementById('sucComuna').value,
+                region: document.getElementById('sucRegion').value, pais: document.getElementById('sucPais').value
+            };
+            if(id) { await updateDoc(doc(db, "sucursales", id), data); mostrarToast("Sucursal Actualizada"); }
+            else { await addDoc(collection(db, "sucursales"), data); mostrarToast("Sucursal Creada"); }
+            cancelarEdicion('Sucursal'); cargarSucursales();
+        });
 
+        // ================= MÓDULO 3: SOLICITANTES =================
+        async function cargarSolicitantes() {
+            const snap = await getDocs(collection(db, "solicitantes"));
+            const lista = document.getElementById('listaSolicitantes'); lista.innerHTML = '';
+            dbMem.solicitantes = {};
+            snap.forEach(docSnap => {
+                const d = docSnap.data(); dbMem.solicitantes[docSnap.id] = d;
+                const empresasNombres = d.empresas ? d.empresas.map(id => dbMem.empresas[id]?.nombre || '').filter(Boolean).join(', ') : '';
+                lista.innerHTML += `<tr><td class="p-4 font-medium text-emerald-600 dark:text-emerald-400">${d.nombre} ${d.apellido}</td><td class="p-4 text-slate-500 text-xs">${d.correos.join('<br>')}</td><td class="p-4 text-slate-500 text-xs">${empresasNombres}</td><td class="p-4 text-right whitespace-nowrap">
+                    <button onclick="prepararEdicion('Solicitante', '${docSnap.id}')" class="text-blue-500 hover:text-blue-700 mr-3"><i class="bi bi-pencil-square"></i></button>
+                    <button onclick="eliminarDoc('solicitantes','${docSnap.id}')" class="text-red-500"><i class="bi bi-trash"></i></button>
+                </td></tr>`;
+            });
+        }
         document.getElementById('formSolicitante').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnGuardarSolicitante');
+            const id = document.getElementById('solicitanteEditId').value;
+            const correos = document.getElementById('solCorreos').value.split(',').map(c => c.trim()).filter(c => c);
+            const empresasSel = Array.from(document.querySelectorAll('input[name="empAsociada"]:checked')).map(cb => cb.value);
+            if(empresasSel.length === 0) { mostrarToast("Debe seleccionar al menos una empresa", "error"); return; }
             
-            const data = {
-                nombre: document.getElementById('solNombre').value.trim(),
-                apellido: document.getElementById('solApellido').value.trim(),
-                correo: document.getElementById('solCorreo').value.trim(),
-                empresa_id: document.getElementById('solEmpresaId').value
-            };
-
-            btn.disabled = true;
-            btn.innerHTML = '<i class="bi bi-hourglass-split"></i> Guardando...';
-
-            try {
-                await addDoc(collection(db, "solicitantes"), data);
-                document.getElementById('formSolicitante').reset();
-                cargarSolicitantes();
-            } catch (error) {
-                alert("Error al guardar: " + error.message);
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-save"></i> Guardar Solicitante';
-            }
+            const data = { nombre: document.getElementById('solNombre').value, apellido: document.getElementById('solApellido').value, correos: correos, empresas: empresasSel };
+            if(id) { await updateDoc(doc(db, "solicitantes", id), data); mostrarToast("Solicitante Actualizado"); }
+            else { await addDoc(collection(db, "solicitantes"), data); mostrarToast("Solicitante Creado"); }
+            cancelarEdicion('Solicitante'); cargarSolicitantes();
         });
 
-        // ================= FUNCIÓN GLOBAL ELIMINAR =================
-        window.eliminarRegistro = async (coleccion, id) => {
-            if(confirm(`¿Estás seguro de que deseas eliminar este registro de ${coleccion}?`)) {
-                try {
-                    await deleteDoc(doc(db, coleccion, id));
-                    if(coleccion === 'empresas') cargarEmpresas();
-                    if(coleccion === 'solicitantes') cargarSolicitantes();
-                } catch(error) {
-                    alert("Error al eliminar: " + error.message);
+        // ================= MÓDULO 4: CATEGORÍAS (Códigos Internos) =================
+        async function cargarCategorias() {
+            const snap = await getDocs(collection(db, "categorias_equipo"));
+            const lista = document.getElementById('listaCategorias'); const selEq = document.getElementById('eqCategoria');
+            lista.innerHTML = ''; selEq.innerHTML = '<option value="">Seleccione Categoría</option>'; dbMem.categorias = {};
+
+            snap.forEach(docSnap => {
+                const d = docSnap.data(); dbMem.categorias[docSnap.id] = d;
+                const cod = `${d.letra}-${d.subcodigo}`;
+                lista.innerHTML += `<tr><td class="p-4 font-bold text-pink-600 dark:text-pink-400"><span class="bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded mr-2 text-xs">${cod}</span>${d.nombre}</td><td class="p-4 text-right whitespace-nowrap">
+                    <button onclick="prepararEdicion('Categoria', '${docSnap.id}')" class="text-blue-500 hover:text-blue-700 mr-3"><i class="bi bi-pencil-square"></i></button>
+                    <button onclick="eliminarDoc('categorias_equipo','${docSnap.id}')" class="text-red-500"><i class="bi bi-trash"></i></button>
+                </td></tr>`;
+                selEq.innerHTML += `<option value="${docSnap.id}">${cod} - ${d.nombre}</option>`;
+            });
+        }
+        document.getElementById('formCategoria').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('categoriaEditId').value;
+            const data = { letra: document.getElementById('catLetra').value, subcodigo: document.getElementById('catSubcodigo').value.toUpperCase(), nombre: document.getElementById('catNombre').value, descripcion: document.getElementById('catDesc').value };
+            if(id) { await updateDoc(doc(db, "categorias_equipo", id), data); mostrarToast("Categoría Actualizada"); }
+            else { await addDoc(collection(db, "categorias_equipo"), data); mostrarToast("Categoría Creada"); }
+            cancelarEdicion('Categoria'); cargarTodo(); // Recargar todo para actualizar Selects de Equipos
+        });
+
+        // ================= MÓDULO 5: EQUIPOS (Fotos y Correlativo) =================
+        async function cargarEquipos() {
+            const snap = await getDocs(collection(db, "equipos"));
+            const lista = document.getElementById('listaEquipos'); lista.innerHTML = '';
+            dbMem.equipos = {};
+            snap.forEach(docSnap => {
+                const d = docSnap.data(); dbMem.equipos[docSnap.id] = d;
+                const img = d.img_url ? `<img src="${d.img_url}" class="w-10 h-10 object-cover rounded shadow-sm inline-block mr-3">` : '';
+                lista.innerHTML += `<tr><td class="p-4 flex items-center">${img}<span class="font-bold text-orange-600 dark:text-orange-400">${d.codigo_interno}</span></td><td class="p-4 font-medium">${d.nombre} <br><span class="text-xs text-slate-500">Serie: ${d.serie}</span></td><td class="p-4 text-right whitespace-nowrap">
+                    <button onclick="prepararEdicion('Equipo', '${docSnap.id}')" class="text-blue-500 hover:text-blue-700 mr-3"><i class="bi bi-pencil-square"></i></button>
+                    <button onclick="eliminarDoc('equipos','${docSnap.id}')" class="text-red-500"><i class="bi bi-trash"></i></button>
+                </td></tr>`;
+            });
+        }
+        document.getElementById('formEquipo').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('btnGuardarEquipo'); btn.disabled = true; btn.innerHTML = 'Procesando...';
+            const id = document.getElementById('equipoEditId').value;
+            try {
+                const catId = document.getElementById('eqCategoria').value;
+                const catData = dbMem.categorias[catId];
+                let codigoGenerado = document.getElementById('equipoCodInterno').value; // Usar el retenido si es edición
+                
+                // Si es CREACIÓN, calcular correlativo
+                if(!id) {
+                    const q = query(collection(db, "equipos"), where("categoria_id", "==", catId));
+                    const eqSnap = await getDocs(q);
+                    const numero = (eqSnap.size + 1).toString().padStart(3, '0');
+                    codigoGenerado = `${catData.letra}-${catData.subcodigo}-${numero}`;
                 }
+
+                // Lógica de Foto
+                let imgUrl = document.getElementById('equipoOldImg').value; // Mantener foto vieja por defecto
+                const file = document.getElementById('eqFoto').files[0];
+                if(file) {
+                    const storageRef = ref(storage, `equipos_img/${codigoGenerado}_${Date.now()}`);
+                    const uploadResult = await uploadBytes(storageRef, file);
+                    imgUrl = await getDownloadURL(uploadResult.ref);
+                }
+
+                const data = {
+                    categoria_id: catId, codigo_interno: codigoGenerado,
+                    nombre: document.getElementById('eqNombre').value, marca: document.getElementById('eqMarca').value,
+                    modelo: document.getElementById('eqModelo').value, serie: document.getElementById('eqSerie').value, img_url: imgUrl
+                };
+
+                if(id) { await updateDoc(doc(db, "equipos", id), data); mostrarToast(`Equipo ${codigoGenerado} Actualizado`); }
+                else { await addDoc(collection(db, "equipos"), data); mostrarToast(`Equipo ${codigoGenerado} Creado`); }
+                
+                cancelarEdicion('Equipo'); cargarEquipos();
+            } catch (err) { mostrarToast("Error: " + err.message, "error"); } 
+            finally { btn.disabled = false; btn.innerHTML = 'Guardar'; }
+        });
+
+        // ================= LÓGICA GENÉRICA DE EDICIÓN Y ELIMINACIÓN =================
+        window.prepararEdicion = (modulo, id) => {
+            document.getElementById(`form${modulo}`).reset(); // Limpiar form
+            document.getElementById(`titulo-form-${modulo.toLowerCase()}`).innerHTML = `<i class="bi bi-pencil-square"></i> Editar Registro`;
+            document.getElementById(`btnGuardar${modulo}`).innerText = 'Actualizar';
+            document.getElementById(`btnCancelar${modulo}`).classList.remove('hidden');
+            
+            if(modulo === 'Empresa') {
+                const d = dbMem.empresas[id]; document.getElementById('empresaEditId').value = id; document.getElementById('empNombre').value = d.nombre;
+            } else if (modulo === 'Sucursal') {
+                const d = dbMem.sucursales[id]; document.getElementById('sucursalEditId').value = id; document.getElementById('sucEmpresa').value = d.empresa_id; document.getElementById('sucAlias').value = d.alias; document.getElementById('sucDir').value = d.direccion; document.getElementById('sucComuna').value = d.comuna; document.getElementById('sucRegion').value = d.region; document.getElementById('sucPais').value = d.pais;
+            } else if (modulo === 'Solicitante') {
+                const d = dbMem.solicitantes[id]; document.getElementById('solicitanteEditId').value = id; document.getElementById('solNombre').value = d.nombre; document.getElementById('solApellido').value = d.apellido; document.getElementById('solCorreos').value = d.correos.join(', ');
+                document.querySelectorAll('input[name="empAsociada"]').forEach(cb => cb.checked = false); // Reset checks
+                d.empresas.forEach(empId => { const cb = document.getElementById(`chk_emp_${empId}`); if(cb) cb.checked = true; });
+            } else if (modulo === 'Categoria') {
+                const d = dbMem.categorias[id]; document.getElementById('categoriaEditId').value = id; document.getElementById('catLetra').value = d.letra; document.getElementById('catSubcodigo').value = d.subcodigo; document.getElementById('catNombre').value = d.nombre; document.getElementById('catDesc').value = d.descripcion;
+            } else if (modulo === 'Equipo') {
+                const d = dbMem.equipos[id]; document.getElementById('equipoEditId').value = id; document.getElementById('eqCategoria').value = d.categoria_id; document.getElementById('eqNombre').value = d.nombre; document.getElementById('eqMarca').value = d.marca; document.getElementById('eqModelo').value = d.modelo; document.getElementById('eqSerie').value = d.serie; document.getElementById('equipoCodInterno').value = d.codigo_interno; document.getElementById('equipoOldImg').value = d.img_url || '';
             }
         };
 
+        window.cancelarEdicion = (modulo) => {
+            document.getElementById(`form${modulo}`).reset();
+            document.getElementById(`${modulo.toLowerCase()}EditId`).value = '';
+            document.getElementById(`titulo-form-${modulo.toLowerCase()}`).innerHTML = `Nuevo Registro`;
+            document.getElementById(`btnGuardar${modulo}`).innerText = 'Guardar';
+            document.getElementById(`btnCancelar${modulo}`).classList.add('hidden');
+            if(modulo === 'Equipo') { document.getElementById('equipoCodInterno').value = ''; document.getElementById('equipoOldImg').value = ''; }
+        };
+
+        // Modal de confirmación para eliminar (Reemplazo del confirm)
+        window.eliminarDoc = async (col, id) => {
+            // Un pequeño toast de confirmación custom para no usar confirm()
+            const div = document.createElement('div');
+            div.className = "fixed inset-0 bg-black/50 z-50 flex items-center justify-center backdrop-blur-sm";
+            div.innerHTML = `
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-xl max-w-sm w-full text-center">
+                    <i class="bi bi-exclamation-circle text-4xl text-red-500 mb-4 block"></i>
+                    <h3 class="text-lg font-bold mb-2">¿Eliminar registro?</h3>
+                    <p class="text-slate-500 mb-6 text-sm">Esta acción no se puede deshacer y borrará los datos permanentemente.</p>
+                    <div class="flex gap-3">
+                        <button id="btn-cancel-del" class="flex-1 bg-slate-200 text-slate-800 py-2 rounded-lg font-bold hover:bg-slate-300">Cancelar</button>
+                        <button id="btn-confirm-del" class="flex-1 bg-red-600 text-white py-2 rounded-lg font-bold hover:bg-red-700">Eliminar</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(div);
+            
+            document.getElementById('btn-cancel-del').onclick = () => div.remove();
+            document.getElementById('btn-confirm-del').onclick = async () => {
+                div.remove();
+                try {
+                    await deleteDoc(doc(db, col, id));
+                    mostrarToast("Registro eliminado");
+                    if(col === 'empresas' || col === 'categorias_equipo') cargarTodo(); // Afectan otros modulos
+                    else if(col === 'sucursales') cargarSucursales();
+                    else if(col === 'solicitantes') cargarSolicitantes();
+                    else if(col === 'equipos') cargarEquipos();
+                } catch(e) { mostrarToast("Error: " + e.message, "error"); }
+            };
+        };
     </script>
 </body>
 </html>
