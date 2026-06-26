@@ -1,0 +1,144 @@
+--- css/styles.css (原始)
+
+
++++ css/styles.css (修改后)
+/* Estilos globales para INELRED v2.0 */
+
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --slate-light: #f8fafc;
+    --slate-dark: #0f172a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 100vh;
+}
+
+/* Animaciones suaves */
+.transition-all {
+    transition: all 0.3s ease;
+}
+
+.hover-scale {
+    transition: transform 0.2s ease;
+}
+
+.hover-scale:hover {
+    transform: translateY(-4px);
+}
+
+/* Cards interactivas */
+.card-interactive {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.card-interactive:hover {
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+}
+
+/* Formularios */
+.form-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background-color: var(--slate-light);
+    border: 1px solid #e2e8f0;
+    border-radius: 0.5rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.dark .form-input {
+    background-color: var(--slate-dark);
+    border-color: #334155;
+}
+
+.dark .form-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
+/* Botones */
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Tablas responsivas */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-styled {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table-styled th,
+.table-styled td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.dark .table-styled th,
+.dark .table-styled td {
+    border-bottom-color: #334155;
+}
+
+/* Badges de estado */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-success {
+    background-color: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+}
+
+.badge-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.badge-danger {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
+.badge-info {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: var(--primary);
+}
